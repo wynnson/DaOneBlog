@@ -19,17 +19,46 @@
     <img src="../assets/images/dummies_guide_to_linear_regression/linear_regression.png">
     <div class="source">Source: <a href="https://web.stanford.edu/class/stats202/notes/Linear-regression/Multiple-linear-regression.html">Stanford Stats 202</a></div>
 
+    <!-- WHY -->
+    <h2>Primer: Pikachu mysteriously struck by lightning</h2>
+    <p> 
+        Pikachu is walking outside and suddenly sees an ominous cloud approaching. 
+        Soon, the cloud catches up to Pikachu and a bolt of lightning strikes him.
+        That felt bad. Pikachu goes home and does research.
+        Pikachu gathers data on all the factors he thins causes lightning strikes.
+        High humidity? Definitely part of the equation. 
+        Type of material Pikachu was standing on? Maybe.
+        Day of the week? Probably not.
+        To make these assumptions, he used previous data and optimized the weights of his model to get:
+        
+        $$
+            \text{lightning strike} = 0.7 \cdot \text{humidity} + 0.25 \cdot \text{ground material} + 0.05 \cdot \text{day}
+        $$
+        
+        Pikachu just came up with a <strong>linear regression model</strong> to <strong>predict</strong> the odds of a lightning strike.
+    </p>
+
+    <div class="note">
+        <h4>Clarification</h4>
+        <p>
+            For simplicity, I will be refering to hyperplanes as "lines" and categorizing them with lines.
+        </p>
+    </div>
+
+    <hr>
+
+    <!-- WHAT -->
     <h2> WTF is linear regression?</h2>
     $$ y = mx + b $$
 
-    <p> That's it ... </p>
+    <p> That's it... </p>
     <p>
         Remember when you were supposed to find the slope (m) and y intercept (b) based on some x, y coordinates in middle school? 
         This is no different. 
         In middle school, we used 2 points: x, y to find the m and b.
-        Expect, interpolating between x, y means that we can find the exact line we want.
+        Expect, interpolating between x, y means that we can find the exact line we want with 100% accuracy.
         In machine learning (and statistics), we might have multiple points so we can't find exactly where to place our line.
-        Instead, we make the best estimate of where we think the line should be.
+        Instead, we make the best estimate of where we think the line should be ($\hat{y}$).
         Oh yeah, in ML we use cool kid symbols to show we know what we are doing:
         
         $$
@@ -38,7 +67,7 @@
             b &= \theta_0
             \end{aligned}
             \qquad \Rightarrow \qquad
-            y = \theta_1 x + \theta_0
+            \hat{y} = \theta_1 x + \theta_0
         $$
     </p>
 
@@ -46,7 +75,7 @@
     <p>
         At the end of the day we still want an approximate line: $y = mx + b$. 
         How do we get it? By adjusting our m's and b's of course!
-        In ML, we combine m's and b's into $\theta$.
+        In ML, we combine m's and b's into $\theta$ (known as <i>parameters</i> or <i>weights</i>).
         We can then tune the $\theta_n$ values to make our line fit (or at least try to fit) our datapoints.
         This are now represented by:
 
@@ -57,10 +86,10 @@
             \theta_1 \\
             \vdots \\
             \theta_d
-            \end{bmatrix}
+            \end{bmatrix}_{d + 1, 1}
         $$
         
-        Note. We can have many datapoints. Using fancy math notation lets rewrite our y and x:
+        Because we can have many datapoints, lets rewrite x, y with fancy math notation:
 
         $$
             y =
@@ -68,31 +97,245 @@
             y_0 \\
             y_1 \\
             \vdots \\
-            y_d
-            \end{bmatrix}
-            
-            \qquad 
-            
-            x =
+            y_n
+            \end{bmatrix}_{n, 1}
+
+            \hat{y} =
             \begin{bmatrix}
-            x_0 \\
-            x_1 \\
+            \hat{y}_0 \\
+            \hat{y}_1 \\
             \vdots \\
-            x_d
+            \hat{y}_n
+            \end{bmatrix}_{n, 1}
+            
+            \quad
+
+            X = 
+            \begin{bmatrix} 
+            x_0^T \\
+            x_1^T \\
+            \vdots \\
+            x_n
+            \end{bmatrix}_{n, d + 1}
+
+            \quad
+            
+            x_i =
+            \begin{bmatrix}
+            x_{i0} \\
+            x_{i1} \\
+            \vdots \\
+            x_{id}
             \end{bmatrix}
+            
+            =
+            \begin{bmatrix}
+            f_0(x) \\
+            f_1(x) \\
+            \vdots \\
+            f_d(x) \\
+            \end{bmatrix}_{1, \ d + 1}
+
+            \quad  \text{where } x_{i0} = 1
         $$
 
+        $$
+            \Rightarrow \hat{y}_i = \theta^T_i x_i = x^T_i \theta_i \\
+            \Rightarrow \hat{y} = X \theta
+        $$
+    </p>
+    
+    <div class="note">
+        <h4>Note</h4>
+        <ul>
+            <li> $X$'s rows are $x_i^T$. $X$ is usually called training data. </li>
+            <li>$\theta^T$ so matrix math lines up (vice versa works too)</li>
+            <li><p>$x_{id}$ can be from some arbitrary function of $x$. <br>
+                   For example, $x_{i1} = f(x) = x^3$
+                </p></li>
+            <li>
+                <p>The dimension of $X$ is ($n, \ d + 1$):
+                <ul>
+                    <li>$n$, number of points</li>
+                    <li>$d + 1$, number of features where $ + 1 $ is from the intercept term</li>
+                    <li>$x_{i0} = 1$ so we can keep our intercept value $\theta_0$ when multiplying</li>
+                    <li>$\hat{y}$ is a linear combination of features (LCF)</li>
+                </ul>
+                </p>
+            </li>
+        </ul>
+    </div>
+    
+    <p>
         Because we have datapoints (x, y) that are labeled, we can categorize linear regression as
         <strong> supervised machine learning</strong>. 
     </p>
+
+    </p>
     <div class="important">
-        <h3>Recap</h3>
+        <h4>Recap</h4>
         <p>
             <strong>We have:</strong> datapoints (y, x)  <br>
             <strong>We want:</strong> optimized $\theta$ values for best line through datapoints
         </p>
     </div>
     
+    <hr>
+
+    <!-- HOW -->
+    <h2>Finding $\theta$ (Closed Form Solution)</h2>
+    <p>
+        The most common method is the <strong>Least Squares Method</strong>. 
+        It minimizes the sqaured difference between the actual y value and our predicted $\hat{y}$ for all our points. 
+        The difference is known as the <strong>residual</strong> which represents our error.
+        In other words, we are minimizing the sum of squared errors (SSE):
+
+        $$
+            SSE = \sum_i^n (y_i - \hat{y_i})^2 \quad \text{for all points, sum the sqaured errors}
+        $$
+
+        $$ 
+            \text{Least Squares} = \min (SSE) = \min \sum_i^n (y_i - \hat{y_i})^2
+        $$ 
+
+        <img src="../assets/images/dummies_guide_to_linear_regression/sse.png">
+        <div class="source">Source:
+            <a href="https://corporatefinanceinstitute.com/resources/data-science/sum-of-squares/">
+                Corporate Finance Institute
+            </a>
+        </div>
+        <br>
+
+        Since we are minimizing Least Squares (LS), we call that optimizing our <strong>objective function</strong>. 
+        An objective function, more specifically a <strong>loss function</strong> in this case, measures how wrong our prediction is, hence the minimization of it.
+        A common loss function you might encounter is mean squared error (MSE):
+
+        $$
+            \text{MSE} = \frac{1}{n} \sum_i^n (y_i - \hat{y}_i)^2 = \text{avg(SSE)}
+        $$
+
+        Optimizing $\hat{y}$ using least squares will give you the same thing as MSE as you will shortly see.
+        Remember $\hat{y}$ comes from our parameter $\theta$, so we can write our loss function as $L(\theta)$
+        Lets pick MSE as our loss function:
+    </p>
+
+    <!-- OPTIMIZATION STEP (Closed Form)-->
+    <p>
+        $$
+        \begin{aligned}
+            L(\theta) &= \min (MSE) = \min \frac{1}{n} \sum_i^n (y_i - \hat{y}_i)^2 \\
+                      &= \min \frac{1}{n} (y - X \theta)^T (y    - X \theta) \qquad \text{from squared term} \\
+                      &= \min \frac{1}{n} (y^T - \theta^T X^T) (y - X \theta) \\
+                      &= \min \frac{1}{n} (y^T y - y^T X \theta - \theta^T X^T y + \theta^T X^T X \theta) \\
+                      &= \min \frac{1}{n} (y^T y - 2\theta^T X^T y + \theta^T X^T X \theta) \qquad \text{$y^T X \theta$ is a scalar so it equals its transpose} \\
+            
+            \nabla L(\theta) &= 0 \\
+                           0 &= \frac{1}{n} (-2 X^T y + 2 X^T X \theta) \\
+                           0 &=  (-2 X^T y + 2 X^T X \theta) \qquad \text{$\frac{1}{n}$ dropped, making MSE = Least Squares} \\
+                     2 X^T y &= 2 X^T X \theta \\
+                       X^T y &= X^T X \theta \\
+                      \theta &= (X^T X)^{-1} (X^T)y
+        \end{aligned}
+        $$ 
+    </p>
+
+    <p>
+        So the theta that minimizes our objective function is found at $\theta = (X^T X)^{-1} (X^T)y$. 
+        If we solve this, we should get the best $\theta$ values that estimates where we should place our line.
+    </p>
+
+    <h2>BUT...</h2>
+
+    <p>
+        Notice the inverse term: $(X^T X)^{-1}$. Solving that is hard ... especially for computers.
+        It might take too long if $X$ is large. 
+        We want a fast way to approximate $\theta$.
+        Thats where we use <strong> gradient descent.</strong>
+    </p>
+
+    <hr>
+
+    <!-- BETTER HOW -->
+    <h2>Approximating "Good Enough" $\theta$ (Gradient Descent)</h2>
+
+    <p>
+        Gradient descent iteratively approximates the minimum which is more computer friendly (think for / while loop).
+        Intuitively, it does this by dropping a ball down a hole.
+        As the ball approaches the bottom, the rate of change at which is descends approaches 0.
+    </p>
+
+    <img src="../assets/images/dummies_guide_to_linear_regression/gradient_descent_gif.gif">
+    <div class="source">Source: <a href="https://towardsdatascience.com/a-visual-explanation-of-gradient-descent-methods-momentum-adagrad-rmsprop-adam-f898b102325c/">towardsdatascience.com</a></div>
+    
+    <br>
+
+    <div class="important">
+        <h4>Gradient Descent Mathematically: </h4>
+        <p>
+            $$
+                \theta = \theta - \alpha \nabla L(\theta) \qquad \text{$\alpha$ is the learning / descending rate (hyperparameter *)}
+            $$
+        </p>
+    </div>
+
+    <p>
+        Let's optimize from earlier but using gradient descent. This optimization is more like an approximation algorithm:
+        
+        $$
+        \begin{aligned}
+        \text{While (True):} \\
+            \theta_{new} &= \theta_{old} - \alpha \nabla L(\theta) \\
+                         &= \theta_{old} - \alpha \cdot \frac{1}{n} (-2 X^T y + 2 X^T X \theta) \qquad \text{from $\nabla L(\theta)$ earlier} \\
+                         &= \theta_{old} - \frac{2 \alpha}{n} (X^T X \theta - X^T y) \\
+            
+            & \ \text{if $(\theta_{new} - \theta_{old}) < \psi$  (some small value *):}\\
+            & \qquad \text{Break} \\
+            \theta_{old} &= \theta_{new}
+        \end{aligned}
+        $$
+
+        Upon breaking from the loop, we get our approximated $\theta$ value.
+    </p>
+
+    <div class="note">
+        (*) A <strong>hyperparameter</strong> is a value you determine before anything runs.
+        <ul>
+            <li>Large $\alpha$ might mis-approximate the minimum. </li>
+            <li>Small $\alpha$ might take too long to converge.</li>
+            <li>Similarly, $\psi$ follows the same logic (break too early / late).</li>
+        </ul>
+        <br>
+        <img src="../assets/images/dummies_guide_to_linear_regression/alpha_rate.png">
+        <div class="source">Source: 
+            <a href="https://ai.stackexchange.com/questions/21925/is-it-harmful-to-set-the-learning-rate-of-training-a-model-to-be-too-high-if-the">
+                AI Stack Exchange
+            </a>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- CONCLUSION -->
+    <h2>Conclusion</h2>
+    <p>
+        So how did Pikachu get his model?
+        He optimized for $\theta$ using gradient descent or calculated it meticulously with the closed form method 
+        (there are even more methods not covered)!
+        At the end of the day, by optimizing the parameters (or weights) $\theta$ using training (past) data, 
+        we got a best "line" which we can use to predict new points somewhat accurately.
+        In doing so, we generated a interesting function, $f_\theta(x)$, 
+        that predicts something based on an underlying linear regression engine.
+    </p>
+
+    <p>
+        $$
+        x \rightarrow f_\theta(x) = \hat{y}
+        $$
+    </p>
+
+    <img src="../assets/images/dummies_guide_to_linear_regression/pikachu_engine.jpg">
+    <div class="source">Source: Me :)</div>
+
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
