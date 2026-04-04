@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dummies Guide to Linear Regression</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a>
+    <h1>Dummies Guide to Linear Regression</h1>
+    
+    <img src="../assets/images/dummies_guide_to_linear_regression/SimpleRegression.png">
+    <div class="source">Source: <a href="https://www.digitalocean.com/resources/articles/what-is-linear-regression">Digital Ocean</a></div>
+
+    <h2> WTF is linear regression?</h2>
+    $$ y = mx + b $$
+
+    <p> That's it ... </p>
+    <p>
+        Remember when you were supposed to find the slope (m) and y intercept (b) based on some x, y coordinates in middle school? 
+        This is no different. 
+        In middle school, we used 2 points: x, y to find the m and b.
+        Expect, interpolating between x, y means that we can find the exact line we want.
+        In machine learning (and statistics), we might have multiple points so we can't find exactly where to place our line.
+        Instead, we make the best estimate of where we think the line should be.
+        Oh yeah, in ML we use cool kid symbols to show we know what we are doing:
+        
+        $$
+            \begin{aligned}
+            m &= \theta_1 \\
+            b &= \theta_0
+            \end{aligned}
+            \qquad \Rightarrow \qquad
+            y = \theta_1 x + \theta_0
+        $$
+    </p>
+
+    <p>Wow! But what are we doing here? </p>
+    <p>
+        At the end of the day we still want an approximate line: $y = mx + b$. 
+        How do we get it? By adjusting our m's and b's of course!
+        In ML, we combine m's and b's into $\theta$.
+        We can then tune the $\theta_n$ values to make our line fit (or at least try to fit) our datapoints.
+        This are now represented by:
+
+        $$
+            \theta =
+            \begin{bmatrix}
+            \theta_0 \\
+            \theta_1 \\
+            \vdots \\
+            \theta_d
+            \end{bmatrix}
+        $$
+        
+        Note. We can have many datapoints. Using fancy math notation lets rewrite our y and x:
+
+        $$
+            y =
+            \begin{bmatrix}
+            y_0 \\
+            y_1 \\
+            \vdots \\
+            y_d
+            \end{bmatrix}
+            
+            \qquad 
+            
+            x =
+            \begin{bmatrix}
+            x_0 \\
+            x_1 \\
+            \vdots \\
+            x_d
+            \end{bmatrix}
+        $$
+
+
+    </p>
+    <div class="important">
+        <h3>Recap</h3>
+        <p>
+            <strong>We have:</strong> datapoints (y, x)  <br>
+            <strong>We want:</strong> optimized $\theta$ values for best line through datapoints
+        </p>
+    </div>
+    
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
