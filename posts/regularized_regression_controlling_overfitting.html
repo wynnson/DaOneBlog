@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dummies Guide to Linear Regression</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a>
+    <h1>Regularized Regression: Controlling Overfitting</h1>
+    
+    <img src="../assets/images/regularized_regression_controlling_overfitting/overfitting.png">
+    <div class="source">Source: <a href="https://gregorygundersen.com/blog/2020/01/31/linear-overfitting/">Gregory Gundersen</a></div>
+
+    <!-- WHY / WHAT IS HAPPENING -->
+    <h2>Primer: Pikachu's Failed Model</h2>
+    <p>
+        <a href="dummies_guide_to_linear_regression.html">Previously</a>, Pikachu built a model to not get struck by lightning.
+        However, while he found that his model is great at predicting from past data, everytime Pikachu goes outside, he still gets struck!
+        Despite wonderful training results from his optimized $\theta$ values, pikachu realizes that his model is not very good at predicting new unseen data.
+        This is <strong>overfitting</strong>.
+    </p>
+
+    <hr>
+
+    <!-- BACKGROUND INFO / WHAT EXPLANATION -->
+    <h2>Background</h2>
+    <p>Here, I will throw out some formulas with notes.
+        <table border="1" cellpadding="8" cellspacing="0">
+        <tr>
+            <th>Formula</th>
+            <th>Term</th>
+            <th>Notes</th>
+        </tr>
+        <tr>
+            <td>$y - \mathbb{E}[\hat{y}]$</td>
+            <td>Bias</td>
+            <td>How far is actual $y$ from average predicted $y$?</td>
+        </tr>
+        <tr>
+            <td>$\frac{1}{N} \sum (\hat{y} - \mathbb{E}[\hat{y}])^2 = \mathbb{E}[(\hat{y} - \mathbb{E}[\hat{y}])^2]$</td>
+            <td>Variance</td>
+            <td>How far is our predicted value from the average predicted values? Does not rely on actual y. How flexible is our model?</td>
+        </tr>
+        <tr>
+            <td>$\text{Bias}^2 + \text{Variance} + \epsilon$</td>
+            <td>Error</td>
+            <td>Same as the expected MSE $\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$ across multiple datasets</td>
+        </tr>
+        </table>
+        <br>
+
+        <img src="../assets/images/regularized_regression_controlling_overfitting/biasVar.jpg">
+        <div class="source">Source: me</div>
+
+        <br>
+
+        The important thing to note is that error is dependent on bias and variance (more dependent on bias). 
+        High bias means underfitting and high variance means overfitting. 
+        We want to balance the two known as the <strong>bias-variance tradeoff</strong>.<br><br>
+
+        <img src="../assets/images/regularized_regression_controlling_overfitting/bias_var_tradeoff.webp">
+        <div class="source">Source: <a href="https://www.geeksforgeeks.org/machine-learning/bias-vs-variance-in-machine-learning/">GeeksforGeeks</a></div>
+        
+        <br>
+
+        <div class="note">
+            <a href="https://mlu-explain.github.io/bias-variance/">Here</a> is a fantastic visual explanation by Amazon's MLU. 
+        </div>
+    </p>
+
+    <hr>
+
+    <!-- FIX FOR IT-->
+    <h2>WTF is Regularization</h2>
+    <p>
+        So what is happening to Pikachu's model? His variance is probably too high :(
+
+        <div class="note">
+            <h4>Note</h4>
+            <p>
+                Usually, the more features we have, the more ways for a model to fit your training data and
+                thus, the higher the variance.
+            </p>
+        </div>
+    </p>
+
+    <p> 
+        So what is the fix? <strong> Regularization!</strong> This concept doesn't only apply to regression models.
+        How do LLMs not overfit? Regularization.
+    </p>
+
+    <div class="important">
+        <h4>Regularization</h4>
+        The idea of <strong>regularization</strong> is to increase bias by a little to bring variance down by a lot.
+    </div>
+
+    <p>
+        So what does this mean? We are restricting our model.
+        By increasing bias (more distance between $y$ and $\hat{y}$), we reduce the model's ability to match the true relationship.
+        Since bias is sqaured, variance will drop a lot, meaning the model will become more stable.
+        What does that mean intuitively?
+    </p>
+
+    <p>
+        Remember in a regression model:
+        $$
+            y = \theta_0 + \theta_1 f_1(x) + \dots + \theta_d f_d(x)
+        $$
+
+        Now, we are need to subject $\theta$ to contraints, pulling the values of $\theta$ down (high values = high variance).
+        Previously, to get those $\theta$ values, we could have used <strong>gradient descent</strong>.
+        Having our objective function as the MSE = Error, Pikachu trained his model so much that he was getting very low training error.
+        However, low training error could cause overfitting and so we are unable to use this model to generalize.
+        Instead of dropping a ball to the minimum, lets add a constraint so that we stop at some point before the minimum.
+        <strong>This means we knowingly increase our error so our model is more generalizable.</strong>
+
+        <img src="../assets/images/regularized_regression_controlling_overfitting/constraint_grad_desc.png">
+        <div class="source">Source: 
+            <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/16-regularized-regression-note.pdf">
+                Madhi Roozbahani (Georgia Tech)
+            </a>
+        </div> <br>
+    </p>
+
+    <hr>
+    
+    <h2>How Regularization Works</h2>
+    <p>
+        All we need to do is add a constraint during training. 
+        Without constraining, $\theta$ becomes very large naturally.
+        We can do this by adding a <strong>regularization (penalty) term</strong>:
+
+        $$
+            L(\theta) = E(\theta) + \text{Regularization Term} \qquad \text{where $E(\theta)$ = MSE}\\
+            L(\theta) = E(\theta) + \lambda \theta^T \theta \qquad \qquad \qquad \text{$\lambda$ is a hyperparameter}
+        $$
+        
+        Since $\lambda$ is a <strong>hyperparameter</strong>, we must choose it:
+        <ul>
+            <li> A large $\lambda$ means our optimzer will assign small $\theta$ values</li>
+            <li> A small $\lambda$ means our optimzer will assign large $\theta$ values</li>
+        </ul>
+        in order to reduce penalty.
+
+        <div class="note">
+            <h4>Note</h4>
+            <p>
+                $\theta^T \theta$ is the same as $\theta_1^2 + \theta_2^2 + \dots + \theta_d^2$.
+                We do this to penalize large $\theta$ values and make optimization easy since it becomes a convex function
+                and during gradient descent, it becomes $2\lambda \theta$.
+                Large penalty means our objective function's error ($E(\theta) + \text{penalty}$) becomes very big
+                so the optimzer will avoid these $\theta$ values.
+            </p>
+        </div>
+    </p>
+    <p>
+        So now, we have:
+        $$
+            E(\theta) = \frac{1}{N}\sum_{i}^n (y_i - X\theta)^2 + \lambda ||\theta||_2^2
+        $$
+        Remember that $X\theta = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \dots + \theta_d x_d$.
+        Before we get confused, lets replace $x$ with $z$, to clarify that $x$ can be any polynomial function
+        $f(x) = z$.
+    </p>
+    <p>
+        This is only a type of regression known as <strong>ridge regression</strong>.
+        Here are some more:
+    </p>
+    
+    <h2>Ridge Regression (L2 norm penalty term):</h2>
+    <p>
+
+        $$
+            E(\theta) = \frac{1}{N}\sum_{i}^n (y_i - z\theta)^2 + \lambda ||\theta||_2^2
+        $$
+        
+        <div class="figure-pair">
+            <div>
+                <img src="../assets/images/regularized_regression_controlling_overfitting/ridge_regression3d.png">
+            </div>
+            <div>
+                <img src="../assets/images/regularized_regression_controlling_overfitting/ridge_reg.webp">
+            </div>
+        </div>
+        <div class="source">
+            Source (left): 
+            <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/16-regularized-regression-note.pdf">
+                Madhi Roozbahani (Georgia Tech)
+            </a> <br>
+            Source (right):
+            <a href="https://towardsdatascience.com/ridge-regression-for-better-usage-2f19b3a202db/">
+                towardsdatascience.com
+            </a>
+        </div>
+
+
+        <div class="important">
+            <ul>
+                <li>
+                    Area that the circle touches the ellipsoid (objective function ($E(\theta)$)) is a
+                    particular choice of $\theta$ values (some $\theta$ assignments are very small).
+                </li>
+                <li>Convex model</li>
+                <li>Both MSE, L2 are differentiable</li>
+                <li>Closed form solution exists (set $\nabla L(\theta) = 0$): 
+                    $$ 
+                        \theta = (z^T z + \lambda I)^{-1} z^T y
+                    $$
+                </li>
+            </ul>
+        </div>
+    </p>
+
+    <h2>Lasso Regression (L1 norm penalty term):</h2>
+    <p>
+        $$
+            E(\theta) = \frac{1}{N}\sum_{i}^n (y_i - z\theta)^2 + \lambda ||\theta||_1
+        $$
+
+        <div class="figure-pair">
+            <div>
+                <img src="../assets/images/regularized_regression_controlling_overfitting/lasso_regression3d.png">
+            </div>
+            <div>
+                <img src="../assets/images/regularized_regression_controlling_overfitting/lasso_reg.png">
+            </div>
+        </div>
+        <div class="source">
+            Source (left): 
+            <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/16-regularized-regression-note.pdf">
+                Madhi Roozbahani (Georgia Tech)
+            </a> <br>
+            Source (right):
+            <a href="https://allmodelsarewrong.github.io/lasso.html">
+               G. Sanchez & E.Marzban
+            </a>
+        </div>
+
+        <div class="important">
+            <ul>
+                <li>
+                    Edges touched by the ellipsoid (objective function ($E(\theta)$)) is a
+                    particular choice of $\theta$ values where all other $\theta$ values not touched are 0.
+                </li>
+                <li>Convex model</li>
+                <li>L1 is NOT differentiable</li>
+                <li>No closed form solution exists</li>
+            </ul>
+        </div>
+
+        If Lasso is not diffrentiable, how do we optimize $\theta$? Introducing: <strong>subgradient descent</strong>:
+
+        $$
+            L(\theta) = \frac{\partial E(\theta)}{\partial \theta} = -z^T (y - z \theta) + \lambda \cdot \text{sign}(\theta)
+        $$
+        $$
+            \text{sign($\theta$)} =
+            \begin{cases}
+            1 & \theta > 0 \\
+            -1 & \theta < 0 \\
+            [-1,1] & \theta = 0
+            \end{cases}
+        $$
+
+        We choose $[-1, 1]$ for $\theta = 0$ because there is no single slope at 0 so any slope from left / right works.
+    </p>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
