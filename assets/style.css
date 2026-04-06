@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'JetBrains Mono', monospace;
   max-width: 720px;
@@ -36,6 +41,8 @@ a {
   color: #1a1a1a;
   text-decoration: none;
   border-bottom: 1px solid #ccc;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 a:hover {
@@ -62,6 +69,15 @@ pre code {
 
 .katex-display {
   margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 600px) {
+  .katex-display {
+    font-size: 0.8em;
+  }
 }
 
 blockquote {
@@ -146,6 +162,11 @@ table {
   border-collapse: collapse;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 th,
 td {
   border: 1px solid black;
@@ -184,4 +205,32 @@ td:first-child {
   margin-top: 0.5rem;
   border-top: none;
   padding-top: 0;
+}
+
+@media (max-width: 600px) {
+  body {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  h1 { font-size: 1.25rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 1rem; }
+
+  .figure-pair {
+    flex-direction: column;
+  }
+
+  .figure-pair > div {
+    max-width: 100%;
+  }
+
+  .figure-pair img {
+    height: auto;
+  }
+
+  th:first-child,
+  td:first-child {
+    min-width: auto;
+  }
 }

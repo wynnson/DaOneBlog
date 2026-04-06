@@ -33,6 +33,7 @@
     <!-- BACKGROUND INFO / WHAT EXPLANATION -->
     <h2>Background</h2>
     <p>Here, I will throw out some formulas with notes.
+        <div class="table-scroll">
         <table border="1" cellpadding="8" cellspacing="0">
         <tr>
             <th>Formula</th>
@@ -55,6 +56,7 @@
             <td>Same as the expected MSE $\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$ across multiple datasets</td>
         </tr>
         </table>
+        </div>
         <br>
 
         <img src="../assets/images/regularized_regression_controlling_overfitting/biasVar.jpg">
@@ -102,6 +104,13 @@
         The idea of <strong>regularization</strong> is to increase bias by a little to bring variance down by a lot.
     </div>
 
+    <img src="../assets/images/regularized_regression_controlling_overfitting/regularization_restrict.png">
+    <div class="source">Source: 
+        <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/16-regularized-regression-note.pdf">
+            Madhi Roozbahani (Georgia Tech)
+        </a>
+    </div> <br>
+
     <p>
         So what does this mean? We are restricting our model.
         By increasing bias (more distance between $y$ and $\hat{y}$), we reduce the model's ability to match the true relationship.
@@ -115,7 +124,7 @@
             y = \theta_0 + \theta_1 f_1(x) + \dots + \theta_d f_d(x)
         $$
 
-        Now, we are need to subject $\theta$ to contraints, pulling the values of $\theta$ down (high values = high variance).
+        Now, we need to subject $\theta$ to contraints, pulling the values of $\theta$ down (high values = high variance).
         Previously, to get those $\theta$ values, we could have used <strong>gradient descent</strong>.
         Having our objective function as the MSE = Error, Pikachu trained his model so much that he was getting very low training error.
         However, low training error could cause overfitting and so we are unable to use this model to generalize.
