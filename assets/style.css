@@ -11,7 +11,7 @@ html, body {
 
 body {
   font-family: 'JetBrains Mono', monospace;
-  max-width: 720px;
+  max-width: 960px;
   margin: 3rem auto;
   padding: 0 1.5rem;
   line-height: 1.7;
@@ -71,7 +71,6 @@ pre code {
   margin: 1.5rem 0;
   overflow-x: auto;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 600px) {
