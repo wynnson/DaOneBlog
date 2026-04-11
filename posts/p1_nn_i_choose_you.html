@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Part 1: Nueral Nets - I Choose You</title>
+  <title>Part 1: Neural Nets - I Choose You</title>
   <link rel="stylesheet" href="../assets/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -14,25 +14,27 @@
 </head>
 <body>
     <a href="../index.html" class="back">← Home</a><br><br>
-    <h1>Part 1: Nueral Nets - I Choose You</h1>
+    <h1>Part 1: Neural Nets - I Choose You</h1>
     
     <img src="../assets/images/p1_nn_i_choose_you/nn.webp">
     <div class="source">Source: <a href="https://towardsdatascience.com/how-to-program-a-neural-network-f28e3f38e811/">towardsdatascience.com</a></div>
-    
+
     <!-- WHY / WHAT IS HAPPENING -->
-    <h2>Primer: All or Nothing</h2>
+    <h2>Background</h2>
     <p>
-        <a href="dummies_guide_to_linear_regression.html">Previously</a>, Pikachu built a regression model to do things like weather forecasting.
-        Recently, <strong> Nueral Networks (NN) </strong> have become quite the hype. 
+        <a href="dummies_guide_to_linear_regression.html">Previously</a>, Pikachu built a linear regression model to do things like weather forecasting.
+        Recently, <strong> Neural Networks (NN) </strong> have become quite the hype. 
         Google defines it as "a machine learning model inspired by the human brain, designed to recognize patterns and process data."
         Quite Novel!
         Underneath the smoke and mirrors, I am going to tell you a secret.
-        A NN is nothing but a regression model! However, it has a gate.
-        And that gate decides whether to fire an <a href ="https://en.wikipedia.org/wiki/All-or-none_law">all or nothing response</a> similar to the synapses in our brain.
+        A NN is nothing but a linear regression model! However, it has a gate.
+        That gate decides how much of a response we should fire.
+        Sometimes, we can choose to fire an <a href ="https://en.wikipedia.org/wiki/All-or-none_law">all or nothing response</a> similar to the synapses in our brain.
     </p>
 
     <div class="note">
-      This chapter will be a precursor to NNs by introducing the most important idea that allows them to work.
+      <h4>Note</h4>
+      This chapter will be a short precursor to NNs by introducing the most important idea that allows them to work.
     </div>
 
     <img class="image-center" src="../assets/images/p1_nn_i_choose_you/all_or_nothing.png">
@@ -41,12 +43,169 @@
     <h2>WTF is an Activation Function?</h2>
     <p>
       Before talking about activation functions, what are we doing?
-      With NNs, we are basically chaining a bunch of regression models together to hopefully get a meaningful output.
-      We will then install a gating mechanism to say whether we want a model output or not (similar to the brain).
+      With NNs, we are basically chaining a bunch of linear regression models together to hopefully get a meaningful output.
+      We will then install a gating mechanism to determine how much we want the output.
       To model this all or nothing response, we use something called an <strong>activation function</strong>.
-      It tells our a nueron (some result from our regression model) whether to let our result through or not.
-      Thus, we have introduced <strong>non-linearity</strong> to our otherwise linear regression model.
+      It tells our a nueron (some result from our regression model) how much we should open our gate.
+      By doing this, we have introduced <strong>nonlinearity</strong> to our otherwise linear regression model.
+      Otherwise, our model would be just another linear regression model.
     </p>
+
+    <hr>
+
+    <h2>Popular Activation Funcions</h2>
+    <P>
+      Which activation function is the best? We don't know! This is an area of active research.
+      Again, each layer can be represented by some linear function. 
+      We will denote the parameters or weights as $W$ and $b$ as the intercept or bias.
+
+      $$
+        y = mx + b \Rightarrow y = Wx + b
+      $$
+
+      Adding an activation function $\phi(x)$:
+
+      $$
+      y = \phi(Wx + b)
+      $$
+
+      Now we can choose any activation function $\phi(x)$ to scale (or turn on / off) our layer's output.
+      Instead of a bunch of composite linear functions:
+
+      $$
+      y = W_3 (W_2 (W_1 x + b_1) + b_2) + b_3 = mx + b
+      $$
+
+      We transformed our function with non linearity:
+
+      $$
+      \phi_3(W_3 \phi_2(W_2 \phi_1(W_1 x + b_1) + b_2) + b_3)
+      $$
+
+      <div class="important">
+        We <i>prefer</i> our activation functions to be:
+        <ol>
+          <li>Differentiable</li>
+          <li>Non-linear</li>
+        </ol>
+        A linear activation function (for example, $x$) doesn't do anything other than scale all inputs by the same constant amoount.
+        At the end, the output is still some linear combination which isn't meaningful.
+      </div>
+
+
+      <div class="note">
+        <h4>Note</h4>
+        Since we <i>choose</i> activation functions $\phi$ for each layer, $\phi$ is a hyperparameter.
+      </div>
+
+
+      Here are some popular ones:
+    </P>
+
+    <div class="table-scroll">
+      <table class="activation-table">
+        <tr>
+          <th>Name</th>
+          <th>Image</th>
+          <th>Description</th>
+          <th>Formula</th>
+        </tr>
+        <tr>
+          <td>Sigmoid</td>
+          <td>
+            <div class="activation-image-slot">
+              <img src="../assets/images/p1_nn_i_choose_you/sigmoid.png">
+            </div>
+          </td>
+          <td>Maps input to a probability between 0 and 1.</td>
+          <td>$$ \phi(x) = \frac{1}{1 + e^{-x}} $$</td>
+        </tr>
+        <tr>
+          <td>Softmax</td>
+          <td><div class="activation-image-slot">
+            <img src="../assets/images/p1_nn_i_choose_you/softmax.png">
+          </div></td>
+          <td>Turns each input (multi-input) into a probability.</td>
+          <td>$$ \phi(x_i) = \frac{e^{x_i}}{\sum_j e^{x_j}} $$</td>
+        </tr>
+        <tr>
+          <td>ReLu</td>
+          <td><div class="activation-image-slot">
+            <img src="../assets/images/p1_nn_i_choose_you/relu.webp">
+          </div></td>
+          <td>Discards negative part. Non-diffrentiable because of kink at 0.</td>
+          <td>$$ \phi(x) = \max(0, x) $$</td>
+        </tr>
+        <tr>
+          <td>Leaky ReLu</td>
+          <td><div class="activation-image-slot">
+            <img src="../assets/images/p1_nn_i_choose_you/leaky_relu.webp">
+          </div></td>
+          <td>ReLu but allow a small negative slope for negative inputs. Non-diffrentiable because of kink at 0.</td>
+          <td>$$ \phi(x) = \max(\alpha x, x), \ \alpha < 1 $$</td>
+        </tr>
+        <tr>
+          <td>Tanh</td>
+          <td><div class="activation-image-slot">
+            <img src="../assets/images/p1_nn_i_choose_you/tanh.png">
+          </div></td>
+          <td>Maps values to the range from -1 to 1 with zero-centered output.</td>
+          <td>$$ \phi(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}} $$</td>
+        </tr>
+        <tr>
+          <td>Swish</td>
+          <td><div class="activation-image-slot">
+            <img src="../assets/images/p1_nn_i_choose_you/swish.webp">
+          </div></td>
+          <td>Like Nike swoosh. Multiplies input sigmoid gate for a smooth nonlinear response.</td>
+          <td>$$ \phi(x) = x \cdot \text{sigmoid}(x) = \frac{x}{1 + e^{-x}} $$</td>
+        </tr>
+        <tr>
+          <td>Step</td>
+          <td><div class="activation-image-slot">
+            <img src="../assets/images/p1_nn_i_choose_you/step.png">
+          </div></td>
+          <td>
+            All or nothing above some threshold. 
+            Usually don't use because gradient not defined (*)
+          </td>
+          <td>
+            $$ \phi(x) = \begin{cases} 0 & \text{if } x < 0,\\ 1 & \text{if } x \ge 0. \end{cases} $$
+            Where 0 is some threshold $\gamma$ that can be adjusted.
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>
+      Non-Diffrentiable Activation Functions
+    </h2>
+    <p>
+      Remember when performing gradient descent, we prefer our functions to be differentiable. 
+      This will matter during backpropogation, a method the NN uses to update weights.
+      However, notice that functions like ReLu are not differentiable.
+      To get around this we can use a <strong>subgradient</strong> value for ReLu and Leaky ReLu:
+
+      $$
+        \tilde g'(a)=
+        \begin{cases}
+          1 & a > 0 \\
+          0 & a < 0 \\
+          [0,1] & a = 0 \quad \text{any value between 0 and 1}
+        \end{cases}
+      $$
+
+      Valid subgradient values are usually mathematically defined especially for different piecewise functions.
+      Always try to avoid setting undefined gradient values of 0 as this leads to vanishing gradient (*).
+    </p>
+
+    <h2>Conclusion</h2>
+    <p>
+      TLDR;
+      Activation functions act as a gate that signals the strength of output from different linear regression neurons.
+      This introduces <strong>nonlinearity</strong> to an otherwise chain of linear functions allowing our NN (a complex function we make) to model non-linear relation from data.
+    </p>
+
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
