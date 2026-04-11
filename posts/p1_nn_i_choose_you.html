@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Part 1: Nueral Nets - I Choose You</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Part 1: Nueral Nets - I Choose You</h1>
+    
+    <img src="../assets/images/p1_nn_i_choose_you/nn.webp">
+    <div class="source">Source: <a href="https://towardsdatascience.com/how-to-program-a-neural-network-f28e3f38e811/">towardsdatascience.com</a></div>
+    
+    <!-- WHY / WHAT IS HAPPENING -->
+    <h2>Primer: All or Nothing</h2>
+    <p>
+        <a href="dummies_guide_to_linear_regression.html">Previously</a>, Pikachu built a regression model to do things like weather forecasting.
+        Recently, <strong> Nueral Networks (NN) </strong> have become quite the hype. 
+        Google defines it as "a machine learning model inspired by the human brain, designed to recognize patterns and process data."
+        Quite Novel!
+        Underneath the smoke and mirrors, I am going to tell you a secret.
+        A NN is nothing but a regression model! However, it has a gate.
+        And that gate decides whether to fire an <a href ="https://en.wikipedia.org/wiki/All-or-none_law">all or nothing response</a> similar to the synapses in our brain.
+    </p>
+
+    <div class="note">
+      This chapter will be a precursor to NNs by introducing the most important idea that allows them to work.
+    </div>
+
+    <img class="image-center" src="../assets/images/p1_nn_i_choose_you/all_or_nothing.png">
+    <div class="source">Source: <a href="https://studymind.co.uk/notes/all-or-nothing-principle/">studymind</a></div>
+
+    <h2>WTF is an Activation Function?</h2>
+    <p>
+      Before talking about activation functions, what are we doing?
+      With NNs, we are basically chaining a bunch of regression models together to hopefully get a meaningful output.
+      We will then install a gating mechanism to say whether we want a model output or not (similar to the brain).
+      To model this all or nothing response, we use something called an <strong>activation function</strong>.
+      It tells our a nueron (some result from our regression model) whether to let our result through or not.
+      Thus, we have introduced <strong>non-linearity</strong> to our otherwise linear regression model.
+    </p>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
