@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K Means: What's That Pokemon? Racism!</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>K Means: What's That Pokemon? Racism! </h1>
+    
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/kmeans-thumb.jpg">
+    <div class="source">Source: <a href="https://prateekvjoshi.com/2013/06/06/what-is-k-means-clustering/">Perpetual Enigma</a></div>
+    
+    
+    <!-- WHY -->
+    <h2>Primer: Racist Pikachu! What's That Pokemon (Type)?</h2>
+    <p> 
+        Pikachu encounters lots of Pokemon on a day to day basis.
+        However, he doesn't always know what that Pokemon's type is and makes a lot of false stereotypical assumptions.
+        Fire? Water? Leaf? That's too many to memorize and they are all too similar.
+        He decides it's time to build a <strong>clustering</strong> algorithm to do this for him algorithmically.
+        "The computer will be the racist one! Not me!" He decides.
+    </p>
+
+    <hr>
+
+    <h2>WTF is K-Means Clustering?</h2>
+    <p>
+        One of the most popular clustering algorithms is <strong>K-means</strong> clustering.
+        At a high level, it assigns points to the closest cluster $c_j$ using some distance function (Minkowski, Hamming, Edit, L1, L2, etc.).
+        When points are all assigned, we will have created $k$ groups. Mathematically, we need to optimize this 
+        objective function:
+        $$
+        \min \sum_i^N \text{dist}(x_i)
+        $$
+
+        Commonly, we choose L2 norm (euclidean distance) as our distance function. 
+
+        $$
+        \min_{c, \pi} \sum_i^n || x_i - c_pi(i) ||^2
+        $$
+        
+        
+        Since we don't use prelabled points,
+        this is a <strong>unsupervised</strong> machine learning algorithm. 
+        Since we are assigning to a group and not <i>between</i> groups, this is a <strong>hard assignment</strong>.
+        Clustering is an NP-hard problem.
+    </p>
+
+    <div class="important">
+        <h4>Steps (Psuedocode)</h4> <br>
+        <p>1. Initialize K centers</p>
+        <p>While not converged:</p>
+        <div style="margin-left: 24px;">
+            <p>2. Assign points to nearest center</p>
+            <p>3. Recompute each center using the cluster mean</p>
+        </div>
+    </div>
+
+    <div class="note">
+        <h4>Note</h4>
+        <p>This means that $K$ is the only hyperparameter we have to set (<i>k</i>-means). </p>
+    </div>
+
+    <p>
+        We will be clustering on the following:
+    </p>
+
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/pokemon_groups.png" style="width: 65%; height: auto;">
+    <div class="source">Source: Me :)</div> <br>
+
+    To make images into datapoints, we might have some values for each one. For example the dataset might contain $n$ points 
+    with 3 features: (% red, % blue, % green). We can then group datapoints based on their features.
+    Implicitly, similar datapoints already will lie near each other. In the image above, assume we have 3 features.
+    Then there are 3 dimensions, representing red, blue, green. Graphing the percentages as (x,y,z), we will notice similar 
+    datapoints group up. This is why we can do clustering in the first place. The data already tells a story.
+
+    <br><br>
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/kmeans3d.png">
+    <div class="source"><a href="https://stanford.edu/~cpiech/cs221/handouts/kmeans.html">Source: Stanford CS221</a></div>
+    <br>
+
+    <div class="important">
+        <h4>Curse of Dimensionality</h4>
+        <p>
+            In high dimensions, we can get cleaner seperation between our groups. 
+            However, if we have too many dimensions, there will be data sparsity, making it hard for points to be effectively grouped.
+            Points will be almost equidistant from all centroids meaning it is easy to misgroup the points.
+            That is why we sometimes drop features and only keep the relevant ones (<strong>feature selection</strong>).
+        </p>
+    </div>
+    
+    <hr>
+    
+    <h2> 1. Initializing K Centers</h2>
+    <p>
+        There are many different ways to assign a "good" center. The most classical way is to randomly assign centers.
+        I will be representing centers as stars.
+
+        $$ \text{Centers: } \quad {c_1, c_2, ..., c_k} \qquad \text{let $K$ = 3}$$
+    </p>
+
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/kmeans1.png" style="width: 65%; height: auto;">
+
+    <h2>While not converged (are we still updating the mean centers?):</h2>
+    <h2>2. Assign Points to Nearest Cluster (E-Step)</h2>
+    <p>
+        We need to decide the cluster membership for each datapoint, $x_i$ by assigning it to the closest cluster:
+        $$
+            \pi(i) = \argmin_{j=1 \ \dots \  k} ||x_i - c_j||^2
+        $$
+        $\pi(i)$ is an assignment function. This says after finding the minimum distance, find the cluster (index) 
+        that gave us this minimum distance. That is why we used $\argmin$ and not $\min$. We 
+        really only care about the cluster $c_j$ that gave us that min value but we need that min to index 
+        into the right cluster. The black arrows represent cluster assignment:
+    </p>
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/kmeans2.png" style="width: 65%; height: auto;">
+
+    <h2>3. Recompute Each Center (M-Step)</h2>
+    <p>
+        After we assign our point to a group, we need to adjust the mean for each clsuter:
+        $$c_j = \frac{1}{|i: \pi(i) = j|} \sum_{i: \pi(i)} x_i$$
+        $|i: \pi(i) = j|$ is cardinality of the set of all indices $i$ such that point $i$ belongs to cluster $j$.
+        The notation (:) means such that. So "$i: \pi(i) = j$" means the indices $i$ such that $i$ is assigned to cluster j.
+        In other words, what is the size of the cluster?
+        We just take the mean of all the values in the cluster.
+        Less rigorously:
+
+        $$
+        c_j = \text{avg}(x_i) = \frac{1}{N_j} \sum_{i: \pi(i) = j}^N x_i
+        $$
+    </p>
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/kmeans3.png" style="width: 65%; height: auto;">
+
+    The red arrow represents us moving the new centers. We do steps 2 & 3 until our means no longer change (convergence).
+
+    <div class="important">
+        <h4>EM Algorithms</h4>
+        <p>
+            E-M steps stand for Expectation and Maximization. K-means is a form of hard assignment expectation maximization.
+            EM algorithms are used to find the MLE (maximum likelihood estimatation) for parameters when there are hidden variables.
+            In other words, we want to optimize our parameters despite cluster membership being hidden.
+
+            <ul>
+                <li>if you knew the assignments, finding the best centers would be easy</li>
+                <li>if you knew the centers, finding the best assignments would be easy</li>
+                <li>but you do not know either one at the start</li>
+            </ul>
+
+            EM estimates the hidden assignment, the cluster membership, (E) and maximizes (M).
+        </p>
+    </div>
+
+    <h2>Finished Result</h2>
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/kmeans4.png" style="width: 65%; height: auto;">
+
+    <p>
+        Yay. Now computer is racist not Pikachu. The runtime is $O$(Iknd).
+        <ul>
+            <li>Computing distance between 2 points is $O$(d) where d is the dimensions</li>
+            <li>Computing distance between all points is $O$(knd) where k is the num of clusters, n is the number of data points</li>
+            <li>We do this for I iterations: $O$(Iknd)</li>
+        </ul>
+        There is no polynomial time algorithm to do the clustering hence it is at least NP, making it NP-hard.
+        This means even after getting the solution, we can't verify it in polytime.
+    </p>
+
+    <h2>How to Choose K?</h2>
+    <p>
+        We can use the <strong>Elbow</strong> method. This works by calculating a <strong>distortion score</strong> which 
+        computes the sum of squared distances from each point to it's assigned center.
+        In other words, the smaller the distance the tighter the clusters vice versa. 
+        At the "elbow", the point at which we start seeing diminishing returns,
+        lies our optimal $K$.
+    </p>
+
+    <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/elbow_method.webp">
+    Suppose the optimal $K$ is 4. That means everything below 4 is underclustered. Everything above is overclustered.
+    <div class="source">Source: <a href="https://www.geeksforgeeks.org/machine-learning/elbow-method-for-optimal-value-of-k-in-kmeans/">GeeksforGeeks</a></div>
+    
+    <h2>Evaluation</h2>
+    <p>
+        One popular way for evaluation is using the <strong>Silhouette Coefficient</strong>:
+
+        $$
+            s(i) = \frac{ b(i) - a(i) } {\max(a(i), b(i))}
+        $$
+
+        Where:
+        <ul>
+            <li>$a(i)$ represents intracluser distance, the distance between points within same cluster</li>
+            <li>$b(i)$ represents intercluster distance, the distance between points and other clusters</li>
+        </ul>
+
+        Logically, we want tight clusters that are far away from each other for the cleanest seperation.
+        Mathematically, $b(i) > a(i)$.
+
+        <br><br>
+
+        <div class="note">
+            <ul>
+                <li>$s(i) = 1$, good (tight groups that are seperated)</li>
+                <li>$s(i) = 0$, neutral</li>
+                <li>$s(i) < 0$, bad (means that point is closer to another cluster than other points in own cluster, potential misclustering)</li>
+            </ul>
+        </div>
+
+        <h2>Conclusion</h2>
+        <p>
+            So how do you group similar points? Clustering! Mathematically and algorithmically,
+            we were able to group our datapoints. Pikachu might be genius and definitely not racist.
+        </p>
+    </p>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
