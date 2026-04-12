@@ -29,6 +29,9 @@
         And thus, <strong>Neural Networks</strong> was born.
     </p>
 
+    <img class="image-center" src="../assets/images/p2_nn_forward_and_back/bluebird.jpg" style="width: 35%; height: auto;">
+    <div class="source">Source: Me :)</div>
+
     <hr>
 
     <h2>WTF is a Neural Network?</h2>
@@ -41,7 +44,8 @@
         So what is a <strong>neuron</strong>?
         Similar to the brain, a neuron is a component of the overarching network.
         Imagine a large supply chain working together to produce a finished good.
-        A neuron acts like a factory or one node in the supply chain. 
+        Different parts of the supply chain are optimized to produce inividual goods that result in a finished product.
+        A neuron acts like a factory or one node in the supply chain.
         Like a factory, it takes in inputs, produces outputs.
 
         <div class="important">
@@ -60,22 +64,8 @@
 
         I will be using $\theta$ instead of $W$ but they are the same thing.
         </div>
-        
-        
-        What about <strong>layers</strong>?
-        Layers are like different countries in globally connected supply chain. 
-        Each country specializes in different things.
-        Similarly, each layer intends to learn a new pattern about the data.
 
-        <img class="image-center" src="../assets/images/p2_nn_forward_and_back/nn_image_gif.gif">
-        <div class="source">Source: <a href="https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=1">3B1B</a></div>
-
-
-        <br><br>
-
-        Layers are made up of neurons that feed other layers. 
-        Like different parts of the supply chain, layers are individually optimized to, at the end, produce a desired result.
-        Similar to real life, we can impose regulations on our factories to produce desired results.
+        Similar to real life, we can impose regulations on our factories (neurons) to produce desired results.
         In a neural network (NN), we call regulations <a href="p1_nn_i_choose_you_act_fn.html">activation functions</a>. 
         They regulate the production of goods or in this case, the strength of the neurons.
 
@@ -87,6 +77,31 @@
           Close the gate more = weaker.
           This introduces nonlinearity that makes NN work (see nitty-gritty details below).
         </div>
+        
+        
+        What about <strong>layers</strong>?
+        Layers are made up of neurons that feed other layers. 
+        Layers are like different countries in globally connected supply chain. 
+        Each country specializes in different things.
+        It can be thought of that each country contains specialized factories.
+        This means that each layer intends to learn a pattern about the data.        
+
+        <img class="image-center" src="../assets/images/p2_nn_forward_and_back/nn_image_gif.gif">
+        <div class="source">Source: <a href="https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=1">3B1B</a></div>
+
+        <br><br>
+
+        <div class="note">
+          <h4>Note</h4>
+          <p>
+            There are a LOT of hyperparameters associated with NNs. Here are some associated with the layers:
+            <ul>
+              <li>Num. of layers</li>
+              <li>Depth of layers</li>
+              <li>Activation functions for each layer</li>
+            </ul>
+          </p>
+        </div>
 
         <br><br>
 
@@ -95,6 +110,17 @@
         forming a linear chain. Regulations (activation functions) introduce nonlinearity so we can get more complex results.
         So don't be afraid of NNs. It is nothing more than a chain of linear regressions regulated by activation functions.
         In other words, a supply chain.
+
+        <div class="important">
+          <h4>Overfitting NNs</h4>
+          <p>
+            Since we have so many paramters, it is very easy to overfit NNs. Read up on
+            <a href="regularized_regression_controlling_overfitting.html">regularization</a> for 
+            linear regression to learn some methods we can use to control overfitting. Another way is
+            <strong>Dropout</strong>: where random neurons get deactivated to prevent system overreliance
+            on that neuron.
+          </p>
+        </div>
     </p>
 
     <hr>
@@ -123,14 +149,14 @@
     
     <div class="note">
       <h4>Note</h4>
-      <p>In real life, instead of using <i>While not converge</i> they use the following hyperparameters:
+      <p>In real life, instead of using <i>While not converge</i> we use the following hyperparameters:
         <ul>
           <li><strong>Epochs</strong>: One epoch is one complete pass through the entire dataset</li>
           <li><strong>Batch Size</strong>: Number of points that belong to a group ("batch"). Dataset is divided by this batch size. This helps reduce memory, noise, and allows you to exploit hardware.</li>
         </ul>
       </p>
 
-      The While loop would be replaced by: <br><br>
+      The While loop is then replaced by: <br><br>
       For each <strong>epoch</strong> in num_epochs:
       <div style="margin-left: 24px;">
         For each <strong>batch</strong>:
