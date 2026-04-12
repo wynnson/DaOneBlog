@@ -6,11 +6,12 @@
 
 ---
 
-Concepts in computer science, machine learning, and math as intuitively as simply as possible.  
+Concepts in CS, ML, Math as intuitively as simply as possible.
+Collection of how I learned it.
 
 **Note:** there is no order.  
 
-Written (painfully) by me, **Wynnson Zheng**.  
+Written (painfully) by Wynnson Zheng.
 No AI-generated explanations.
 
 ---
