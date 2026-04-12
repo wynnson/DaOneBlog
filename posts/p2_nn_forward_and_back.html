@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Part 2: Neural Nets - Forward & Back</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Part 2: Neural Nets - Forward & Back</h1>
+    
+    <img src="../assets/images/p2_nn_forward_and_back/nn_layers.png">
+    <div class="source">Source: <a href="https://www.geeksforgeeks.org/deep-learning/what-is-forward-propagation-in-neural-networks/">GeeksforGeeks</a></div>
+
+    <h2>Primer: WANTED: Bluebird</h2>
+    <p>
+        The FBB (federal bureau of birds) posted large reward for the criminal Bluebird.
+        Pikachu is looking through a large database pictures of birds in hopes of cashing in.
+        Image by image, Pikachu gets more and more tired.
+        "I know!"
+        I'll come up with a model to find Bluebird while I sleep.
+        And thus, <strong>Neural Networks</strong> was born.
+    </p>
+
+    <hr>
+
+    <h2>WTF is a Neural Network?</h2>
+    <p>
+        Before we define what a neural network is, we need to understand the components of it.
+        We can break it down into <strong>layers</strong> and <strong>neurons</strong>.
+        
+        <br><br>
+        
+        So what is a <strong>neuron</strong>?
+        Similar to the brain, a neuron is a component of the overarching network.
+        Imagine a large supply chain working together to produce a finished good.
+        A neuron acts like a factory or one node in the supply chain. 
+        Like a factory, it takes in inputs, produces outputs.
+
+        <div class="important">
+        <h4> Neuron = Linear Function</h4>
+        A neuron contains outputs from other neurons as inputs.
+        In other words, it is a linear function of weights and biases.
+
+        $$
+        y = \sum W x_i + b_i
+        $$
+        
+        Since a neuron's input depends on another's output, the functions are implicitly composite:
+        $$
+          y = W_3 (W_2 (W_1 x + b_1) + b_2) + b_3
+        $$
+
+        I will be using $\theta$ instead of $W$ but they are the same thing.
+        </div>
+        
+        
+        What about <strong>layers</strong>?
+        Layers are like different countries in globally connected supply chain. 
+        Each country specializes in different things.
+        Similarly, each layer intends to learn a new pattern about the data.
+
+        <img class="image-center" src="../assets/images/p2_nn_forward_and_back/nn_image_gif.gif">
+        <div class="source">Source: <a href="https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=1">3B1B</a></div>
+
+
+        <br><br>
+
+        Layers are made up of neurons that feed other layers. 
+        Like different parts of the supply chain, layers are individually optimized to, at the end, produce a desired result.
+        Similar to real life, we can impose regulations on our factories to produce desired results.
+        In a neural network (NN), we call regulations <a href="p1_nn_i_choose_you_act_fn.html">activation functions</a>. 
+        They regulate the production of goods or in this case, the strength of the neurons.
+
+        <div class="important">
+          <h4>Activation Function</h4>
+          <p>$$\phi (y = \sum W x_i + b_i) $$</p>
+          An activation function, $\phi$, acts like a gate or knob to tweak the neuron output.
+          Open the gate more = stronger. 
+          Close the gate more = weaker.
+          This introduces nonlinearity that makes NN work (see nitty-gritty details below).
+        </div>
+
+        <br><br>
+
+        And that's all a NN is: a chain of specialized layers (built of neurons) that try to learn something about the data.
+        Each neuron gets it's input from the neuron's before it (except the very first one of course - these can be thought of as natural resources),
+        forming a linear chain. Regulations (activation functions) introduce nonlinearity so we can get more complex results.
+        So don't be afraid of NNs. It is nothing more than a chain of linear regressions regulated by activation functions.
+        In other words, a supply chain.
+    </p>
+
+    <hr>
+
+    <h2>Steps For Training Your Network</h2>
+    <p>
+      1. Initialize initial parameters (these are like natural resources)
+      <br><br>
+      While not converged:
+      <div style="margin-left: 24px;">
+        2. Forward pass (send the goods around)
+        <br>
+        3. Backward pass (optimization of routes - <strong>Back Propagation</strong>)
+        <br>
+        4. Update params &amp; gradient descent then check convergence
+      </div>
+    </p>
+
+    <div class="important">
+      <strong>Training</strong> a NN involves a forward pass and a backward pass to update your beliefs ($W$ & $b$).
+      <strong>Inference</strong> is when you just run your NN (forward pass) and expect to get some output (usually from a trained model).
+    </div>
+
+    <img class="image-center" src="../assets/images/p2_nn_forward_and_back/nn_gif.gif">
+    <div class="source">Source: <a href="https://pub.towardsai.net/deep-learning-simplified-feel-and-talk-like-an-expert-in-neural-networks-911dce0765e9">Towards AI</a></div>
+    
+    <div class="note">
+      <h4>Note</h4>
+      <p>In real life, instead of using <i>While not converge</i> they use the following hyperparameters:
+        <ul>
+          <li><strong>Epochs</strong>: One epoch is one complete pass through the entire dataset</li>
+          <li><strong>Batch Size</strong>: Number of points that belong to a group ("batch"). Dataset is divided by this batch size. This helps reduce memory, noise, and allows you to exploit hardware.</li>
+        </ul>
+      </p>
+
+      The While loop would be replaced by: <br><br>
+      For each <strong>epoch</strong> in num_epochs:
+      <div style="margin-left: 24px;">
+        For each <strong>batch</strong>:
+        <div style="margin-left: 24px;">
+          ...
+        </div>
+      </div>
+    </div>
+
+
+    <h2>Nitty-Gritty Details of Our Supply Chain</h2>
+
+    We will be using this example:
+    <img class="image-center" src="../assets/images/p2_nn_forward_and_back/example_nn.png">
+    <div class="source">Source: <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/19-neural-network-cnn.pdf">Madhi Roozbahani (Georgia Tech)</a></div>
+    <br>
+
+    <h3> 1. Initialize Parameters </h3>
+    <p> 
+      One crucial parameter is our weights denoted by $\theta$. $\theta$ should never start at 0.
+      Why? Because then chaining layers will always result in 0s (from the multiplication).
+      Here you might also ask what do we pass in?
+      Well, it depends on the problem you are trying to solve.
+      At the end of the day, we pass in features, $x_i$, or datapoints, represented by numberical values.
+      If you were trying to fit a line, $x$ could be a bunch of line values.
+      You could even map words into numbers and pass them in (LLMs).
+      Here, Pikachu might want to transform an image of Bluebird into pixel values.
+    </p>
+
+    <div class="note">
+      <h4>Note</h4>
+      The last layer's activation function determines the output we will get and thus we need to match it with the problem we are trying to solve.
+      So if we are trying to solve classification, the last layer's activation function might do a softmax (converts all values into probabilities)
+      and we take the highest probability to output a classification result.
+    </div>
+
+    <br>
+
+    <h3> 2. Forward Pass </h3>
+    <p> 
+      In this step, we calculate the $u$'s (linear regression output) and $o$'s (output after activation function).
+      Each neuron produces $u$ but we have to apply regulation $o$.
+
+      <div class="important">
+        <h4>Layers</h4>
+        See how in the first layer, every feature neuron is connected to some neuron (showed in brown) in the hidden layer?
+        This is known as <strong>Fully Connected Layer</strong>
+        A <strong>Hidden Layer</strong> are the intermediary layers between the first and last layer.
+      </div>
+
+      We will first use a simple example for the forward pass (notice the activation functions):
+      
+      <img class="image-center" src="../assets/images/p2_nn_forward_and_back/nn_ex_simple.png">
+      <div class="source">Source: <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/19-neural-network-cnn.pdf">Madhi Roozbahani (Georgia Tech)</a></div>
+      <br>
+
+      Mathematically, we have:
+      
+      $$ 
+      \begin{aligned}
+        u_{11} &= \theta_0 + \theta_2 x_i = u_{11} = o_{11} \quad \text{linear activation function $\phi(u) = u$} \\
+        u_{12} &= \theta_1 + \theta_3 x_i = u_{12} = o_{12} \\
+        u_{21} &= \theta_4 + \theta_5 o_{11} + \theta_6 o_{12} \\
+        u_{21} &= o_{21} = f(x) \\
+          f(x) &= \theta_4 + \theta_5 (\theta_1 + \theta_3 x_i) + \theta_6 (\theta_1 + \theta_3 x_i) \\ 
+               &= \theta_4 + \theta_5 \theta_1 + \theta_5 \theta_3 x_i + \theta_6 \theta_1 + \theta_6 \theta_3 x_i \\
+               &= \theta_4 + \theta_5 \theta_1 + \theta_6 \theta_1 + \theta_5 \theta_3 x_i + \theta_6 \theta_3 x_i \\
+      \end{aligned}
+      $$
+      
+      let $\theta_4 + \theta_5 \theta_1 + \theta_6 \theta_1 = \theta_0$ and  $\theta_5 \theta_3 x_i + \theta_6 \theta_3 x_i = \theta_i x$:
+
+      $$ 
+      \begin{aligned}
+        f(x) &= \theta_0 + \theta_i x
+      \end{aligned}
+      $$
+
+      Since all the activation functions are linear, we will get a linear function back. 
+      Again, a NN is just a chain of linear regressions.
+      We need to add activation functions to make our NN nonlinear.
+      We can modify the last layer's activation function to fit our needs (make it into a probability, etc.).
+
+      <div class="note">
+        <h4>Note</h4>
+        If all activation functions are linear, we will get purely linear function back since 
+        $$ \phi(u) = u $$
+        for all layers.
+      </div>
+    </p>
+
+    <p>
+      Going back to the original example:
+      $$
+      \begin{aligned}
+        u_{11} &= \theta_0 + \theta_2 x_i \\
+        o_{11} = o(u_{11}) &= \frac{1}{1 + e^{-u_{11}}} \\
+        u_{12} &= \theta_1 + \theta_3 x_i \\ 
+        o_{12} = o(u_{12}) &= \frac{1}{1 + e^{-u_{12}}} \\
+        u_{21} &= \theta_4 + \theta_5 o_{11} + \theta_6 o_{12} \\ 
+        o_{21} &= u_{21} = f(x) \\ 
+        f(x) &= \theta_4 + \theta_5 \cdot \frac{1}{1 + \exp (-[\theta_0 + \theta_2 x_i])} + \theta_6 \cdot \frac{1}{1 + \exp (-[\theta_1 + \theta_3 x_i])}
+      \end{aligned}
+      $$
+
+      But what does this mean?
+      $$
+      \begin{aligned}
+      \theta_4 &= \text{vertical translation} \\ 
+      \theta_5, \theta_6 &= \text{stretch or squeeze} \\ 
+      \theta_0, \theta_1, \theta_2, \theta_3 &= \text{horizontal translation} \\ 
+      \end{aligned}
+      $$
+      Notice that by adding some nonlinearity, we can start to model complex functions. 
+      More and more of these layers mean more complexity where each layer is specialized at different things.
+
+    <img class="image-center" src="../assets/images/p2_nn_forward_and_back/forward_prop.gif">
+    <div class="source">Source: <a href="https://yogayu.github.io/DeepLearningCourse/03/ForwardPropagation">Xinyu You (yogayu.github.io)</a></div>
+    </p>
+
+    <br>
+
+    <h3>3. Backward Pass (Back Propogation) </h3>
+    <p>
+      Okay. Now we got our output. We need to go backwards and optimize our $\theta$ weights.
+      How did we do this before? Gradient descent (step 4)!
+
+      $$
+      \theta_{new} = \theta_{old} - \alpha \nabla E_{\theta_i}(\theta)
+      $$
+      
+      Now we have to calculate the gradients for every input and then optimize them all later.
+      This means we will need a $\nabla E_{\theta_i}(\theta)$ matrix representing all the errors from our layers
+      and perform gradient descent on it.
+      
+      Explicity, we want to find the error given by each weight $\frac{\partial E}{\partial \theta_i}$
+      which tells us how much did this $\theta_i$ influence our error.
+      
+      Before this, we have to calculate our loss function (assume we use MSE) to even use $\nabla E(\theta)$. 
+      Since we only have one datapoint here, MSE simplifies:
+
+      $$
+      \begin{aligned}
+      L(\theta) = E(\theta) &= \frac{1}{N} \sum_i^N (y - \hat{y})^2 \\
+      E(\theta) &= (y - \hat{y})^2 \\
+            \nabla E_{\theta}(\theta) &= -(y - f(x)) \frac{\partial f(x)}{\partial \theta}, \quad \text{$f(x) = \hat{y}$}\\
+      \end{aligned}
+      $$
+
+      Note that since we found $f(x)$ already in the forward pass and are given label $y$, we can treat the first term like a constant.
+
+      $$
+      \begin{aligned}
+        \nabla E_{\theta}(\theta) &= \Delta \frac{\partial f(x)}{\partial \theta}, \quad \text{$\Delta = -(y - f(x))$}
+      \end{aligned}
+      $$
+
+      Since we are calculating with repect to $\theta$, we need to do find the derivative for each $\theta_i$.
+      Recall $f(x) = o_{21} = u_{21} = \theta_4 + \theta_5 o_{11} + \theta_6 o_{12}$.
+      
+      <br><br>
+      
+      Hidden layer output:
+
+      $$
+      \begin{aligned}
+      \nabla E_{\theta_4} (\theta) &= \Delta \cdot 1 = \Delta \\
+      \nabla E_{\theta_5} (\theta) &= \Delta \cdot o_{11} \\
+      \nabla E_{\theta_6} (\theta) &= \Delta \cdot o_{12}
+      \end{aligned}
+      $$
+
+      Hidden layer input:
+
+      $$
+      \begin{aligned}
+      
+      \nabla E_{\theta_3} (\theta) = \frac{\partial f(x)}{\partial o_{12}} \cdot \frac{\partial o_{12}}{\partial u_{12}} \cdot \frac{\partial u_{12}}{\partial \theta_{3}}
+      &= a \cdot b \cdot c \\
+      &= \theta_6 \cdot b \cdot x_i \\
+      o_{12} &= [1 + \exp(-u)] ^ {-1} \\
+      \frac{\partial o_{12}}{\partial \theta_3} = b &= -1 \cdot -1 \cdot (1 + \exp (-u))^{-2} \cdot \exp (-u) \\
+      b &= \frac{\exp (-u)}{[1 + \exp (-u)]^2} = \frac{1 + \exp (-u) - 1}{[1 + \exp (-u)]^2} \\
+      b &= \frac{1}{1 + \exp (-u)} \left[ \frac{1 + \exp (-u)}{1 + \exp(-u)} - \frac{1}{1 + \exp(-u)} \right] \\
+      b &= o_{12} [1 - o_{12}] \qquad \qquad \text{This form can be applied to all of the others!!} \\\\
+      \nabla E_{\theta_3} (\theta) &= \Delta \cdot \theta_6 \cdot o_{12} [1 - o_{12}] \cdot x_i \\
+      
+      \nabla E_{\theta_2} (\theta) &= \Delta \cdot \theta_5 \cdot o_{11}[1 - o_{11}] \cdot x_i \\
+
+      \nabla E_{\theta_1} (\theta) &= \Delta \cdot \theta_6 \cdot o_{12}[1 - o_{12}] \\
+
+      \nabla E_{\theta_0} (\theta) &= \Delta \cdot \theta_5 \cdot o_{11}[1 - o_{11}] \\
+      
+      \end{aligned}
+      $$
+
+      Gradients:
+      $$
+      \nabla E(\theta)
+      =
+      \begin{bmatrix}
+      \frac{\partial E}{\partial \theta_0} \\[4pt]
+      \frac{\partial E}{\partial \theta_1} \\[4pt]
+      \frac{\partial E}{\partial \theta_2} \\[4pt]
+      \frac{\partial E}{\partial \theta_3} \\[4pt]
+      \frac{\partial E}{\partial \theta_4} \\[4pt]
+      \frac{\partial E}{\partial \theta_5} \\[4pt]
+      \frac{\partial E}{\partial \theta_6}
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+      \Delta \cdot \,\theta_5\,o_{11}(1-o_{11}) \\
+      \Delta \cdot \,\theta_6\,o_{12}(1-o_{12}) \\
+      \Delta \cdot \,\theta_5\,o_{11}(1-o_{11})\,x_i \\
+      \Delta \cdot \,\theta_6\,o_{12}(1-o_{12})\,x_i \\
+      \Delta \\
+      \Delta \cdot \,o_{11} \\
+      \Delta \cdot \,o_{12}
+      \end{bmatrix}
+      $$
+
+      $$
+      \Delta = -(y - f(x))
+      $$
+    </p>
+
+    <img class="image-center" src="../assets/images/p2_nn_forward_and_back/nn_steps.gif">
+    <div class="source">Source: <a href="https://machinelearningknowledge.ai/wp-content/uploads/2019/10/Backpropagation.gif">machinelearningknowledge.ai</a></div>
+    <br>
+
+    <br>
+  
+  <h3>4. Checking for convergence </h3>
+  <p>
+    Now, we can do gradient descent normally:
+
+    $$
+    \theta_{new} = \theta_{old} - \alpha \nabla E(\theta)
+    $$
+
+    Then we can check if $\theta_{new} - \theta_{old} < \text{threshold}$ to break out.
+  </p>
+
+  <h2>Conclusion</h2>
+  <p>
+    So how can Pikachu find Bluebird? Well, he will have to do the following:
+    <ol>
+      <li>Convert images to pixel (numbers)</li>
+      <li>Build a NN with different layers + activations</li>
+      <li>Train his NN model (steps above + last activation layer = softmax for classification)</li>
+      <li>Inference using trained model</li>
+      <li>Cash in bounty</li>
+    </ol>
+
+    <div class="note">
+      <h4>Note</h4>
+      <p>
+        We would typically use *CNN (Convolutional Nerual Networks) architecture for this task so the model can learn useful features from images.
+        CNNs have things like pooling and convolutions (sliding kernels) to detect spatial features and build feature maps.
+        Under the hood, CNN is just another NN built specifically for images (might cover in the future).
+      </p>
+    </div>
+
+    Great! We've learned that a NN is nothing but a fancy chained linear regression model with gates 
+    (or else it would just be a linear regression model).
+    Everything works together like a supply chain to produce something we want!
+  </p>
+
+  <img class="image-center" src="../assets/images/p2_nn_forward_and_back/pikabluebird.jpg">
+  <div class="source">Source: Me :)</a></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
