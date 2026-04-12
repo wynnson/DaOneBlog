@@ -175,11 +175,15 @@
 
     <h2>How to Choose K?</h2>
     <p>
-        We can use the <strong>Elbow</strong> method. This works by calculating a <strong>distortion score</strong> which 
+        We can use the <strong>Elbow Method</strong>. This works by calculating a <strong>distortion score</strong> which 
         computes the sum of squared distances from each point to it's assigned center.
         In other words, the smaller the distance the tighter the clusters vice versa. 
         At the "elbow", the point at which we start seeing diminishing returns,
         lies our optimal $K$.
+
+        $$
+        \text{distortion} = \sum_j^K \sum_i^n || (x_i) - c_j ||^2
+        $$
     </p>
 
     <img class="image-center" src="../assets/images/k_means_whats_that_pokemon/elbow_method.webp">
@@ -206,6 +210,7 @@
         <br><br>
 
         <div class="note">
+            <h4>Note</h4>
             <ul>
                 <li>$s(i) = 1$, good (tight groups that are seperated)</li>
                 <li>$s(i) = 0$, neutral</li>
