@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decision Trees Are If Statements</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Decision Trees Are If Statements</h1>
+    
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/decision_tree.png">
+    <div class="source">Source: <a href="https://algodaily.com/lessons/decision-trees-basics">Algo Daily</a></div>
+
+    <!-- WHY -->
+    <h2>Primer: To primer or not?</h2>
+    <p> 
+        I was deciding whether I wanted a primer for today. If I made a primer, it would take some time to come up with a story.
+        If I didn't write a primer, it would be weird. So I decided to make a primer while thinking about whether I should.
+        I just made a decision based on some if-else chain. In fact, I made the best decision possible given my dilema.
+        In other words, I minimized the entropy.
+    </p>
+
+    <hr>
+
+    <h2>WTF is a Decision Tree?</h2>
+    <p>
+        A decision tree is just an if else chain. If a condition, then do this. If another condition then do that.
+        We chain these conditionals to make a decision. It is a <strong>supervised</strong> approach used for regression and classification.
+        Thats it!!
+    </p>
+
+    <h3>Example</h3>
+    <p>
+        Imagine you are shown a picture of nature. Your job is to tell what season it is in.
+        What might you think of? Maybe your thought process looks like this:
+    </p>
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/example_tree.png" style="width: 65%; height: auto;">
+
+    <p>
+        These are just if-else conditions that led you to the correct season, Fall. 
+        For decision trees, we focus on 1 feature at a time, asking how does this feature help me solve the problem.
+        Of course, we need to examine this mathematically.
+    </p>
+    <div class="note">
+        <h4>Note</h4>
+        <p>Hyperparameters include:
+            <ul>
+                <li>max depth</li>
+                <li>max features</li>
+                <li>min samples needed per split</li>
+                <li>$\pi$ purity threshold</li>
+            </ul>
+        </p>
+    </div>
+
+    <br>
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/decision-tree-tutorial-animated3.webp">
+    <div class="source">Source: <a href="https://algobeans.com/2016/07/27/decision-trees-tutorial/">Algo Beans</a></div>
+
+    <hr>
+
+    <h2>Entropy Entropy Entropy</h2>
+    <p>
+        Are you surprised by 3 repeated "Entropy" in the title? In physics, entropy describes the amount of chaos a system has.
+        We can quantify chaos by saying that <strong>entropy</strong> is the surprise of a system. 
+    </p>
+    <div class="important">
+        Entropy (surprise $H$):
+        $$
+        H \ = \ -\sum_{i=1}^n P_i log_2 P_i \ = \ \sum_{i=1}^n P_i log_2 \frac{1}{P_i}
+        $$
+
+        When probability is nearly equal, entropy is high. This makes sense because it means that we have maximum randomness.
+        When probability is leaning towards a certain outcome, entropy is low. This makes sense because we already anticipate the chance of that outcome happening.
+    </div>
+
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/entropy_levels.png">
+    <div class="source">Source: <a href="https://mbernste.github.io/posts/entropy/">Matthew N. Bernstein</a></div>
+    <br>
+
+    <p>
+        So why do we care about entropy?
+        Well when making deicisions, you are taking the decision that minimizes your surprise (entropy).
+        Everytime you make a decision, your entropy splits:
+
+        $$
+        H_{after \ split} = H_L \cdot P_L + H_R \cdot P_R
+        $$
+
+        where $L$ represents left and $R$ represents right. 
+        Entropy decreases with every split you make. As you go down the tree, you now have a fraction of the entropy
+        due to the children being more similar. Your basically maximizing splits that seperate your data into clean groups.
+        Each time you split, your data is transformed into something cleaner (hopefully) than the original no split data.
+        Reducing entropy is the same as increasing information.
+        
+        <div class="important">
+        <strong>Information gain ($IG$)</strong>:
+
+        $$
+        IG = H - (H_L \cdot P_L + H_R \cdot P_R)
+        $$
+
+        Represents the amount by which ambiguity (entropy, surprise) decreased from splitting nodes.
+        </div>
+
+        So what is the objective function of a decision Tree?
+        Maximizing information gain or minimizing surprise!
+
+        $$
+        \max(IG) = \max \left[ H - (H_L \cdot P_L + H_R \cdot P_R) \right] = \min(H) \ = \ -\sum_{i=1}^n P_i log_2 P_i
+        $$
+
+        So what does this mean for decision trees? <u>At each node, we choose the feature that maximizes information gain,
+        dividing the children into more and more uniform groups (less surprise)</u>. For example, in the nature picture above, 
+        the feature I chose before Fall was <i> is orange scenary</i>. Because the picture had orange pixels, this maximized
+        my information gain. However, there are other possible features to choose from like: <i> Are plants alive?</i> 
+        <i> Is the scenary majority green?</i> <i> Is the image very sunny? </i> We chose the one that maximized IG.
+    </p>
+
+    <hr>
+
+    <h2>When to Stop?</h2>
+    <p>
+        Typically, there is a hyperparamter that controls the maximum depth of the tree.
+        If there was no hyperparameter, the decision tree could <u>very easily overfit</u> as it would eventually make very hyper specific generalizations for your dataset.
+        In other words, a decision tree can achieve 100% accuracy! But that is usually bad!!! That means your decision tree optimizes too much for your dataset.
+        Given a new dataset, it will most likely NOT perform very well as it basically makes exceptions (hyper specific ruleset) for your data.
+        So when do we stop splitting? Here are some common methods:
+
+        <ol>
+            <li>All points belong to same class</li>
+            <li>There are fewer points than some threshold (min samples hyperparameter) to split on</li>
+            <li>All points belong to some majority class set by a purity threshold (eg: 95% of samples belong to one class)</li>
+            <li>Further splitting doesn't improve training loss</li>
+        </ol>
+    </p>
+
+    <br>
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/decision_tree_stopping.gif">
+    <div class="note">We stop when everything belongs to the same class (yellow with yellow, purple with purple). We use features to draw decision lines.</div>
+    <div class="source">Source: <a href="https://www.youtube.com/playlist?list=PLPTV0NXA_ZSjXY1XnEmtyHN5do21KCgJR">Vizuara</a></div>
+    <br>
+
+    <hr>
+
+    <h2>Why Don't We Use Decision Trees Everywhere?</h2>
+    <p>
+        Decision trees take <strong>very long</strong> to train on large datasets. For each feature, you have to check a TON of conditions. 
+        Should I split on x, y, or z? Which split maximizes my information gain? For each feature, you need to build the conditions
+        that make the best decision forming a large and expensive tree. 
+        However, this means that when you figure that out, inference (prediction) is very fast.
+
+        <br><br>
+        In large datasets, we can have a ton of features which also increases the risk of overfitting.
+        To mitigate this we have to do some preprossessing through feature engineering and figuring out the 
+        features that actually matter to the decision making. For isntance, to tell the season, whether it is raining might not help too much 
+        because it rains in every season albeit less some. Other ways of reducing overfitting include:
+
+        <ul>
+            <li>More training data!!!</li>
+            <li>Removing irrelavant features (talked about above)</li>
+            <li>Tree prunning (remove weak or redundant branches to reduce noise)</li>
+            <li>Ensemble learning</li>
+        </ul>
+
+        <div class="note">
+            <h4>TL;DR</h4>
+            <ul>
+                <li>Prone to overfitting</li>
+                <li>Takes long time to train</li>
+                <li>Unstable (usually requiring ensemble methods)</li>
+            </ul>
+        </div>
+    </p>
+
+    <hr>
+
+    <h2>Tree Pruning</h2>
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/ShouldWePrune.png">
+    <div class="source">Source: <a href="https://developers.google.com/machine-learning/decision-forests/overfitting-and-pruning">Google ML</a></div>
+
+    <br>
+    <p>
+        Tree pruning happens when you have a grown tree. It is similar to removing diseases crops in your field.
+        Here is the general algorithm:
+        $$
+            \begin{align}
+            &\ \text{Create validation accuracy for current tree} \\
+            &\text{While (further pruning improves validation):} \\
+            &\qquad \ \text{Find impact on validation for each node} \\
+            &\qquad \ \text{Greedily remove the node with the most impact} \\
+            &\qquad \ \text{Check if removing it improves validation accuracy} \\
+            &\qquad \ \text{If so, replace it with a leaf} \\
+            &\qquad \ \text{Else, put it back}
+            \end{align}
+        $$
+    </p>
+
+    <hr>
+
+    <h2>Ensemble Learning</h2>
+    <p>
+        Decision trees by themselves are unstable. This is because the first splits affect all the splits below it.
+        So how do we combat this? <strong>Ensemble learning</strong>! 
+        This means combining multiple models into 1 (through voting) to improve stablity (reduce variance) of the final classifier.
+    </p>
+
+    <br>
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/Random Forest 03.gif">
+    <div class="source">Source: <a href="https://blog.tensorflow.org/2021/05/introducing-tensorflow-decision-forests.html">Tensorflow</a></div>
+    <br>
+
+    <ul>
+        <li>
+            <h3>Bagging</h3>
+            <p>Bagging or Bootstrap Aggregating samples the dataset multiple times, using all the features:</p>
+            <p>
+                $$
+                \begin{aligned}
+                \text{Picks samples $S^*$ (bootstrap sample) of size $n$ with replacement} \\
+                \text{Train on $S*$ to get our decision tree $t^*$} \\
+                \text{Repeat above $\beta$ times to get $t_1, t_2, ..., t_\beta$} \\
+                \text{Final model } t(x) = \operatorname{majority}\{t_\beta(x)\} \\
+                \end{aligned}
+                $$
+            </p>
+        </li>
+        <li>
+            <h3>Random Forests</h3>
+            <p>
+                Random forest is the same thing as bagging decision trees expect with randomness.
+                We will randomly pick $m$ of the $d$ available attributes (random subset of features) at every split when growing the tree.
+                In other words, random forest = bagged <strong>random</strong> decision tree.
+            </p>
+        </li>
+        <div class="note">
+            <h4>Note</h4>
+            <p>
+                Hyperparameters include:
+                <ul>
+                    <li>$m^*$ = number of randomly chosen features, where m is usually $\sqrt{d}$ which is optimized through cross-validation</li>
+                    <li>$d$ = number of features (dimensions, attributes). It is a hyperparam because you can do feature engineering.</li>
+                    <li>$\beta$ = number of models to ensemble</li><br>
+                    (*) for random forest
+                </ul>
+            </p>
+        </div>
+    </ul>
+
+    <hr>
+
+    <h2>Conclusion</h2>
+    <p>
+        Sorry Pikachu wasn't around today. Hope you learned about how decision trees are if-else statements that minimize entropy 
+        or maximize information gain. Remember that decision trees take a long time to train and overfit. We control them by setting
+        hyperparams, doing some feature engineering, or using ensemble. But when we do get a finished tree, they are speedy.
+        Here is Pikachu on a tree:
+    </p>
+
+    <br>
+    <img class="image-center" src="../assets/images/decision_trees_are_if_statements/pikatree.jpg">
+    <div class="source">Source: <a href="https://www.youtube.com/watch?v=wVPAitbCyMY">(YouTube) Pokemon - Pikachu Laughing In A Tree</a></div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
