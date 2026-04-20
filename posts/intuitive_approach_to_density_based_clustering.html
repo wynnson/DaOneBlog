@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>An Intuitive Approach to Density Based Clustering</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>An Intuitive Approach to Density Based Clustering</h1>
+    
+    <br>
+    <img class="image-center" src="../assets/images/intuitive_approach_to_density_based_clustering/db-scan-thumb.gif" style="width: 65%; height: auto;">
+    <div class="source">Source: <a href="https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/">Naftali Harris</a></div>
+
+
+    <h2>Primer: Choosing K is too hard!</h2>
+    <p> 
+        <a href="k_means_whats_that_pokemon.html">Last time</a>, 
+        Pikachu was building a Pokemon type classifier based on type colors.
+        However, coming up with the right K value takes too long and for all Pikachu knows, there could be lots of undiscovered types.
+        Could we go by without it?
+        Yes! Introducting density based clusering <strong>DB Scan</strong>.
+    </p>
+
+    <h2> WTF is DB Scan?</h2>
+    <p>
+        All other clustering methods require knowing or trying to optimize how many clusters we need. 
+        However, <strong>DB Scan</strong>, or <strong>Density Based Spatial Clustering of Applications with Noise</strong>
+        avoids that all together (what a mouthful). The idea is simple: a cluster contains a maximal set of density connected points.
+        This is another <strong>hard clustering algorithm</strong> falling under <strong>unsupervised learning</strong>.
+
+        <div class="important">
+            <h4>2 Hyperparameters:</h4>
+            <ol>
+                <li>$\varepsilon$ (Eps): max radius of neighborhood</li>
+                <li>min pts $\phi$: min number of points in $\varepsilon$ neighborhood of a point</li>
+            </ol>
+        </div>
+
+        So what does that mean? It means for each datapoint, draw a circle. Do other circles touch? 
+        If so they belong in the same neighborhood, $\varepsilon$. There needs to be at least <i>min pts $\phi$</i> in a neighborhood for it to count
+        as a neighborhood.
+    </p>
+    
+    <div class="important">
+    <h3>Types of Points</h3><br>
+    <ul>
+        <li>
+            <h4>Core Point</h4>
+            <p>A core point is a point with more than the min points $\phi$ within its $\varepsilon$ neighborhood</p>
+        </li>
+
+        <li>
+            <h4>Border Point</h4>
+            <p>A border point is a point with fewer than the min points $\phi$ but within $\varepsilon$ neighborhood of a core point</p>
+        </li>
+        
+        <li>
+            <h4>Noise Point</h4>
+            <p>A noise point is an outlier. It is not a core point nor a border point.</p>
+        </li>
+    </ul>
+    </div>
+
+    <br>
+    <img class="image-center" src="../assets/images/intuitive_approach_to_density_based_clustering/types_points.png">
+    <div class="source">Source: <a href="https://stats.stackexchange.com/questions/194734/dbscan-what-is-a-core-point">Stats Stack Exchange</a></div>
+
+    <hr>
+
+    <h2>Connectivity of DB Scan</h2>
+    <p>So how do we get started? Start with a single point:</p>
+    <ol>
+        <li>
+            <h4>Direct Density Reachable</h4>
+            <p>
+                Let $q$ be a core point and $p$ be within its $\varepsilon$ neighborhood. 
+                We can use fellow points inside the neighborhood and keep expanding.
+            </p>
+        </li>
+
+        <li>
+            <h4>Density Reachable</h4>
+            <p>
+                We will now build a chain or a path of epsilon neighborhoods built around core points.
+                Core points will be chained to neighboring core points. 
+                <div class="note">
+                    <h4>Note</h4>
+                    <p>This is not symmetric! $p \rightarrow q \neq q \rightarrow p$</p>
+                </div>
+            </p>
+        </li>
+
+        <li>
+            <h4>Density Connected</h4>
+            <p>
+                Now we've created this chain. We can say for sure that points ($p, q$) belong as a member 
+                of a group if it is reachable from $o$. In other words, if both $p, q$ can be reached from 
+                source $o$, they belong in the same cluster.
+                <div class="note">
+                    <h4>Note</h4>
+                    <p>This is symmetrical: $p \rightarrow q = q \rightarrow p$ </p>
+                </div>
+            </p>
+        </li>
+
+        <img class="image-center" src="../assets/images/intuitive_approach_to_density_based_clustering/connectivity-db-scan.png">
+        <div class="source">Source: <a href="https://mahdi-roozbahani.github.io/CS46417641-spring2026/course/11-density-clustering.pdf">Mahdi Roozbahani (Georgia Tech)</a></div>
+    </ol>
+
+    <hr>
+
+    <h2>Hyperparameter Tuning</h2>
+    <p>
+        We know that DB Scan has 2 hyperparameters, $\varepsilon$ and $\phi$. 
+        A $\varepsilon$ value that is too small means we will over cluster since we will basically create tiny islands that don't chain.
+        A $\varepsilon$ value that is too large means we will under cluster since our island chains get too big and we can't diffrentiate between the neighborhoods.
+        We can find the optimal value of $\epsilon$ using the <strong>elbow method </strong>mentioned in <a href="k_means_whats_that_pokemon.html">KNN</a>.
+        A heuristic (rule of thumb) for $\phi$ is: $\phi \ge 3$.
+        
+        <img class="image-center" src="../assets/images/intuitive_approach_to_density_based_clustering/eblow-dbscan.png">
+        <div class="source">Source: <a href="https://medium.com/@ChandraPrakash-Bathula/from-noise-to-knowledge-explore-the-magic-of-dbscan-which-is-beyond-traditional-clustering-444e40fbc434">Chandra Prakash Bathula</a></div>
+    </p>
+
+    <hr>
+
+    <h2>Evaluation</h2>
+    <p>
+        How do we know if our DB Scan result is good? One way is to use the <strong>Davies-Bouldin Index (DBI)</strong>.
+
+        First, we define a mean:
+
+        $$
+        \mu_i = \frac{1}{n_i} \sum_{x_j \in C_i} X_j
+        $$
+
+        The variance is then:
+
+        $$
+        \sigma_{\mu_i} = \sqrt \frac{\sum_{x_j \in C_i} \delta (X_j, \mu_i) ^ 2}{n_i} = \sqrt{var(C_i)}
+        $$
+
+        where $\delta$ is a distance function.
+        
+        The DB measure is defined as:
+        
+        $$
+            DB_{ij} = \frac{\sigma_mu_i + \sigma_mu_j}{\delta(mu_i, mu_j)} = \frac{\text{spread}}{\text{distance between centers}}
+            = \frac{\text{intracluster dist}}{\text{intercluster dist}}
+        $$
+
+        This represents "badness" or the compactness of the clusters compared to the distance between the means.
+        The numerator is the spread (intracluster distance), and denominator is the distance (intercluster distance).
+        Large $DB_{ij}$ is bad, meaning distance between clusters are close or the cluster is spread out.
+        Small $DB_{ij}$ is good, meaning clusters are far or the cluster is tight.
+        Let:
+
+        $$
+            D_i = \max_{i \neq j} DB_{ij}
+        $$
+
+        represent the largest pariwise "badness". In other words: for this cluster, which other cluster makes it look the worst?
+
+        The final DB Index is the mean of the worse badness scores ($DB_{ij}$):
+        $$
+            DB = \frac{1}{k} \sum^k_{i = 1}D_i
+        $$
+
+        where a lower value DB is better.
+    </p>
+
+    <br>
+    <img class="image-center" src="../assets/images/intuitive_approach_to_density_based_clustering/dbi.jpg">
+    <div class="source">Source: <a href="https://livebook.manning.com/concept/r/davies-bouldin-index">Machine Learning with R (Manning)</a></div>
+
+    <h2>Psuedocode</h2>
+    <p>
+        $$
+        \begin{aligned}
+            &\text{DBSCAN}(X,\epsilon,\text{MinPts})\\
+            &C = 0\\
+            &\text{for each unvisited point } P \text{ in dataset } X:\\
+            &\qquad \text{mark } P \text{ as visited}\\
+            &\qquad \text{NeighborPts} = \text{regionQuery}(P,\epsilon)\\
+            &\qquad \text{if } |\text{NeighborPts}| \le \text{MinPts}:\\
+            &\qquad\qquad \text{mark } P \text{ as NOISE}\\
+            &\qquad \text{else}:\\
+            &\qquad\qquad \text{expandCluster}(P,\text{NeighborPts},C,\epsilon,\text{MinPts})\\
+            &\qquad\qquad C = C + 1\\[6pt]
+            &\text{expandCluster}(P,\text{NeighborPts},C,\epsilon,\text{MinPts})\\
+            &\qquad \text{add } P \text{ to cluster } C\\
+            &\qquad \text{for each point } P' \text{ in NeighborPts}:\\
+            &\qquad\qquad \text{if } P' \text{ is not visited}:\\
+            &\qquad\qquad\qquad \text{mark } P' \text{ as visited}\\
+            &\qquad\qquad\qquad \text{NeighborPts}' = \text{regionQuery}(P',\epsilon)\\
+            &\qquad\qquad\qquad \text{if } |\text{NeighborPts}'| \ge \text{MinPts}:\\
+            &\qquad\qquad\qquad\qquad \text{NeighborPts} = \text{NeighborPts} \cup \text{NeighborPts}'\\
+            &\qquad\qquad \text{if } P' \text{ is not yet member of any cluster}:\\
+            &\qquad\qquad\qquad \text{add } P' \text{ to cluster } C\\[6pt]
+            &\text{regionQuery}(P,\epsilon)\text{ returns all points within }P\text{'s }\epsilon\text{-neighborhood (including }P\text{)}
+        \end{aligned}
+        $$
+    </p>
+
+    <h2>Conclusion</h2>
+    <p>
+        So what should Pikachu do if he is too lazy to find the K value? Use DB-scan! This way, instead of deciding how many clusters exist,
+        he decides how he wants to group the data points into clusters. This is actually way easier than finding the number of clusters 
+        that should exist. The clusters is thus implicitly chosen by the dataset. However, optimizing for $\varepsilon$ is another game of 
+        hyperparameter tuning. The gif at the very top shows DB scan in action. It's just connecting the dots.
+    </p>
+
+    <img class="image-center" src="../assets/images/intuitive_approach_to_density_based_clustering/pikadb-scan.jpg">
+    <div class="source">Source: Me :)</div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
