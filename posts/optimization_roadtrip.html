@@ -38,6 +38,7 @@
         To find a local min/max subject to constraint $g(x,y,z) = k$ (if exists), find the value of $x, y, z, \lambda$ that simultaneously satsify:
         <p>
           $$
+          \mathcal{L} = \nabla f - \lambda g \\
           \nabla f = \lambda \nabla g \\
           g(x,y,z) = k \\
           \lambda \neq 0 
@@ -131,6 +132,91 @@
     </p>
 
     <hr>
+
+    <h2>KKT Conditions</h2>
+    <p>
+      Karush-Kuhn-Tucker (KKT) conditions define a set of conditions to solve a constrained optimization problem.
+      You basically use this to know whether there exists a candidate optimal point for constrained optimization problems that look like:
+      
+      $$
+      \min f(x) \quad \text{subject to} \quad g_i(x) \le 0, \ h_j(x) = 0
+      $$
+
+      These ideas extend lagrangian multipliers. 
+      The problem we did above was subjecting $g(x,y,z)$ to a constant $k$ where $g(x,y,z) = k$.
+      Now what if the constraint is an inequality such as $g(x) \le 0$?
+      The optimum is not a point like before but a region. 
+      Thus we must satisfy the KKT conditions to proceed.
+
+      <div class="important">
+      <h4>4 KKT Conditions:</h4>
+      Let $g(m,s)$ be some arbitrary condition where $g$ depends on $m,s$.
+      <ul>
+        <li>Stationary: $\frac{\partial \mathcal{L}}{\partial \bullet} = 0 $</li>
+        <li>Primal Feasibility: $g(m,s) \le 0$</li>
+        <li>Dual Feasibility: $\lambda \ge 0$</li>
+        <li>Complementary Slackness: $\lambda g(m,s) = 0$
+          <ul>
+            <li>Active constraint: $g(m,s) = 0$ where $\lambda \ge 0$.</li>
+            <li>Inactive constraint: $g(m,s) \neq 0$ where $\lambda = 0$.</li>
+          </ul>
+        </li>
+      </ul>
+      This is also called the <strong>saddle point thereom.</strong>
+      </div>
+
+      In optimization problems there is a <strong>Primal Form</strong> and a <strong>Dual Form</strong>.
+      
+      <div class="important">
+        <h4>Forms</h4>
+        <ul>
+          <li><strong>Primal Form</strong>: Original function $f(x)$</li>
+          <li><strong>Dual Form</strong>: Modifed problem built from lagrangian multipliers</li>
+          <li>max(primal) = min(dual)</li>
+          <li>max(dual) = min(primal)</li>
+        </ul>
+      </div>
+
+      If a primal and dual solution satisfy KKT, they create a candidate optimum pair which helps solve the inequality constraint.
+      We can quantify the primal and dual relationship as either weak or strong.
+
+      <div class="important">
+        <h4>Duality Relationships</h4>
+        <ul>
+          <li>
+            <strong>Weak Duality:</strong>
+            For minimization problems, the dual optimal value is always less than or equal to the primal optimal value.
+            $$
+            d^* \le p^*
+            $$
+            So the dual problem gives a valid lower bound on the true optimum. 
+            We also say there exists a gap between primal and dual optimum values.
+          </li> <br>
+
+          <li>
+            <strong>Strong Duality:</strong>
+            In many well-behaved convex problems, the primal and dual optimal values are equal.
+            $$
+            d^* = p^*
+            $$
+            This means solving the dual also solves the original problem.
+          </li>
+        </ul>
+      </div>
+      
+      <br>
+      <img class="image-center" src="../assets/images/optimization_roadtrip/duality.svg">
+      <div class="source">Source: <a href="https://dnguyen1196.github.io/cs150project/">D. Nguyen</a></div><br>
+    
+
+      <strong>TL;DR </strong>is that KKT turns constrained inequality optimization into solvable equations by extending 
+      the lagrangian method with extra rules for inequalities.
+
+      <hr>
+
+      <h2> KL Divergence </h2>
+
+    </p>
     
 
   <script>
