@@ -37,6 +37,11 @@ ul, ol {
   margin-bottom: 1rem;
 }
 
+.toc-list {
+  list-style-position: inside;
+  padding-left: 0;
+}
+
 a {
   color: #1a1a1a;
   text-decoration: none;

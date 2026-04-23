@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimization Roadtrip</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Optimization Roadtrip</h1>
+    
+    <img class="image-center" src="../assets/images/optimization_roadtrip/lagrange_multip.png">
+    <div class="source">Source: <a href="https://fiveable.me/optimization-systems/unit-10/lagrange-multiplier-method/study-guide/7jehb0752s3YagaZ">Fiveable</a></div>
+    
+    <h2>Brief Optimization Overview</h2>
+    <p>
+      This chapter will mainly serve as a review of optimization so no primer :p.
+      Optimization means we want to minimize or maximize something (usually a function).
+    </p>
+
+    <hr>
+
+    <h2>Method of Lagrangian Multipliers</h2>
+    <p>
+      Lagrangian multipliers is method use to find the local min / max given some constraint by setting gradients of your function and a constraint function parallel.
+      Recall we used this in our <a href="regularized_regression_controlling_overfitting.html">regularized regression</a> lecture to add a constraint during gradient descent.
+      This allowed us to not drop the ball to the very bottom.
+
+      <div class="important">
+        <h4>Formal Def: Method of Lagrange Multipliers</h4>
+        To find a local min/max subject to constraint $g(x,y,z) = k$ (if exists), find the value of $x, y, z, \lambda$ that simultaneously satsify:
+        <p>
+          $$
+          \nabla f = \lambda \nabla g \\
+          g(x,y,z) = k \\
+          \lambda \neq 0 
+          $$
+        </p>
+        Note: sometimes this is written as $\nabla f = -\lambda \nabla g $ to "cancel" the gradients. 
+        $\lambda$ is a constant so it is effectively the same thing.
+      </div>
+
+      It is easier to do an example for this to make sense: <br><br>
+
+      $$
+      \text{Suppose we want to find the point on the sphere $x^2 + y^2 + z^2 = 1$ closest to the point $(3, 1, 3)$} 
+      $$.
+
+      <img class="image-center" src="../assets/images/optimization_roadtrip/lm-1.png" style="width: 65%; height: auto;">
+      <div class="source">Graphed on desmos 3d</a></div>
+    
+      <div class="note">
+        <h4>Overview</h4>
+        <ul>
+          <li>Constraint: sphere => $g = x^2 + y^2 + z^2 = 1$</li>
+          <li>k: 1, where $g(x,y,z) = k$</li>
+          <li>Function: distance => $d = f = \sqrt{(x-3)^2 + (y-1)^2 + (z-3)^2}$</li>
+          <li>Type of Optimization: minimum (distance)</li>
+        </ul>
+        Note, we can use $f = d^2$ for an easier optimization. 
+        This does not change the answer since the smallest distance and smallest sqaured distance occur at the same point.
+      </div>
+
+      Now, let's set up the problem: 
+      $$
+      \begin{aligned}
+        f = d^2 = (x-3)^2 + &(y-1)^2 + (z-3)^2 \\
+        \nabla f = 2(x - 3) \cdot i + &2(y - 1) \cdot j + 2(z - 3) \cdot k \\
+        \nabla g = 2x \cdot i + &2y \cdot j  + 2z \cdot k \\ \\
+        
+        \nabla f &= \lambda \nabla g \\
+        2(x - 3) &= \lambda 2x \Rightarrow x = \frac{3}{1 - \lambda} \\
+        2(y - 1) &= \lambda 2y \Rightarrow y = \frac{1}{1 - \lambda} \\
+        2(z - 3) &= \lambda 2z \Rightarrow z = \frac{3}{1 - \lambda} \\
+
+        s.t. \qquad g(x, y, z) &= k \\\\
+
+        g(x,y,z) = k &\Rightarrow x^2 + y^2 + z^2 = 1 \\
+        (\frac{3}{1 - \lambda})^2 + &(\frac{1}{1 - \lambda})^2 + (\frac{3}{1 - \lambda})^2 = 1 \\
+        \frac{9}{(1-\lambda)^2} + &\frac{1}{(1-\lambda^2)} + \frac{9}{(1-\lambda)^2} = 1 \\
+        19 &= (1-\lambda)^2 \\
+        \lambda &= 1 - \pm \sqrt{19} = 1 \pm \sqrt{19} \\\\
+
+        x = \frac{3}{1 - (1 \pm \sqrt{19})} &= \frac{3}{\pm \sqrt{19}} \\
+        y = \frac{1}{1 - (1 \pm \sqrt{19})} &= \frac{3}{\pm \sqrt{19}} \\ 
+        z = \frac{3}{1 - (1 \pm \sqrt{19})} &= \frac{3}{\pm \sqrt{19}} \\
+      \end{aligned}
+      $$
+      
+      Here we have the following points where the orange represents the negative and blue is the positive:
+      <img class="image-center" src="../assets/images/optimization_roadtrip/lm-2-annotated.jpg">
+      <div class="important">
+        <h4>Surface Normals</h4>
+        Gradients point to the direction of steepest ascent.
+        On a surface, it is represented by the <strong>surface normal</strong>, a vector perpendicular 
+        to that surface at a given point.
+        <img class="image-center" src="../assets/images/optimization_roadtrip/surface_normal.svg">
+        <div class="source">Source: <a href="https://mathworld.wolfram.com/NormalVector.html">Wolfram MathWorld</a></div>
+    
+      </div>
+
+      <div class="note">
+        <h4>Notes</h4>
+        <p>
+          1. Notice how $\lambda$ scaled $\nabla g$ such that it cancels with $\nabla f$. 
+          The important thing is that at the dashed line in black, our gradients are parallel to each other.
+          That means at this parallel line, there exists points that optimize our function hence $\nabla f - \lambda \nabla g = 0$
+          or $\nabla f = \lambda \nabla g$. 
+          
+          <br><br>
+          2. Also note that since $\lambda$ is a constant the negative of it is still a constant. Notation can differ,
+          some books refer $\lambda$ - it doesn't matter.
+        </p>
+      </div>
+
+      Obviously, the blue point is closer to $(3,1,3)$ shown in green.
+      Thus, our optimized point is:
+      $$
+      x = \frac{+3}{\sqrt{19}} \\
+      y = \frac{+1}{\sqrt{19}} \\
+      z = \frac{+3}{\sqrt{19}}
+      $$
+      So what point is closest to $(3,1,3)$? Answer: $(\frac{3}{\sqrt{19}}, \frac{1}{\sqrt{19}}, \frac{3}{\sqrt{19}})$.
+    </p>
+
+    <hr>
+    
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
