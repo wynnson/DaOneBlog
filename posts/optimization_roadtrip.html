@@ -214,8 +214,66 @@
 
       <hr>
 
-      <h2> KL Divergence </h2>
+      <h2> Approximating Lower Bounds: Jenson's Inequality </h2>
+      <p>
+        I am going to switch gears from lagrangian methods and talk about Jenson.
+        
+        <br><br>
+        <img class="image-center" src="../assets/images/optimization_roadtrip/Jensen-Huange-CES-2025-Bloomberg.webp" style="width: 65%; height: auto;">
+        <div class="source">Source (pic of Jensen Huang): <a href="https://www.datacenterknowledge.com/data-center-chips/nvidia-unveils-new-chips-desktop-pc-to-protect-ai-lead">Ian King</a></div><br>
 
+        Just kidding, wrong guy. 
+        However, I am going to talk about how Jensen's Inequality (by another Jensen) is used in optimization.
+        In particular, Jensen's inequality is used to approximate the lower bound of a likelihood (ELBO).
+        The <strong>ELBO</strong> or evidence lower bound is the lower bound on the log-likelihood.
+        Why do we need a lower bound? Because log marginal likelihood (denominator of bayes) is usually very hard to calculate 
+        because it could be summed across many latent variables (will cover bayes in the future).
+        What is this even for? It is mainly for probabilisitic models that use a prior. 
+
+        <br><br>
+        All you need to know is:
+        <ul>
+          <li>For strictly concave regions: $\mathbb{E}[f(x)] \le f(\mathbb{E}[x])$</li>
+          <li>For strictly convex regions: $\mathbb{E[f(x)]} \ge f(\mathbb{E}[x])$</li>
+        </ul>
+        The lower bound is obviously on the "less" side of the inequality. Visually:
+        <img class="image-center" src="../assets/images/optimization_roadtrip/jensen.jpg">
+        <br>
+
+        <ol>
+          <li>
+            For a concave region, the expected value of the function is less than the function of the expected value.
+            Think about it logically: stopping early (where the mean is less), will make you go less high. Thus, 
+            for a concanve function, this is the lower bound.
+          </li>
+          <br>
+          <li>
+            For a convex region, the expected value of the function is more than the function of the expected value. 
+            Think about it logically: not taking a detour on the way down will make you go more down. 
+            Thus for a convex region, this is a lower bound.
+          </li>
+        </ol>
+        <div class="note">
+          <h4>Note</h4>
+          <p>
+            Used for proofs. For example, in KL Divergence.
+          </p>
+        </div>
+      </p>
+
+      <hr>
+
+      <h2>Conclusion</h2>
+      <p>
+        Side lecture. These are just some optimization techniques that are widely used.
+        This lecture was used to give people a solid background. 
+        Also, we will be using these soon (maybe)!
+      </p>
+
+      <img class="image-center" src="../assets/images/optimization_roadtrip/optimization-img.webp" style="width: 65%; height: auto;">
+      <div class="source">Source: <a href="https://towardsdatascience.com/an-introduction-to-surrogate-optimization-intuition-illustration-case-study-and-the-code-5d9364aed51b/">Towards Data Science</a></div>
+    
+      
     </p>
     
 
