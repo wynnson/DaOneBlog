@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stop Getting Spammed</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Stop Getting Spammed</h1>
+
+    <img class="image-center" src="../assets/images/stop_getting_spammed/bayes_nets.png">
+    <div class="source">Source: <a href="https://www.cs.cmu.edu/~15281/coursenotes/bayesnets/">CMU AI</a></div>
+    
+    <h2>Primer: Oshawott is getting spammed! </h2>
+    <p>
+        A Oshawott called Brandon is getting spammed by his friend, Turtwig Austin. 
+        Austin keeps harassing Brandon on whether he has a job yet.
+        Brandon, being the great oshawott engineer he is, decides to build a spam filter.
+        How? We'll use Bayes (more specifically, naive bayes)!
+    </p>
+
+    <h2>Bayes</h2>
+    <p>
+        At a high level, Bayes Thereom uses prior probability to calculate new probability.
+    </p>
+
+    <div class="important">    
+        <h4>Bayes Thereom</h4>  
+        $$
+            P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B)}
+        $$
+    </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
