@@ -21,22 +21,317 @@
     
     <h2>Primer: Oshawott is getting spammed! </h2>
     <p>
-        A Oshawott called Brandon is getting spammed by his friend, Turtwig Austin. 
+        A Oshawott called Brandon is getting spammed by his friend, a Turtwig called Austin. 
         Austin keeps harassing Brandon on whether he has a job yet.
         Brandon, being the great oshawott engineer he is, decides to build a spam filter.
         How? We'll use Bayes (more specifically, naive bayes)!
     </p>
 
-    <h2>Bayes</h2>
+    <hr>
+
+    <h2>Bayes Thereom</h2>
+    <div class="important">
+        <h4>Probability vs Likelihood</h4>
+        <p>Before getting started, we need to understand probability vs likelihood:
+            <ul>
+                <li><strong>Probability</strong>: Chance of future outcomes based on known distribution or parameters</li>
+                <li><strong>Likelihood</strong>: How probable the outcome is to fit our parameters</li>
+            </ul>
+        </p>
+    </div>
+    
     <p>
-        At a high level, Bayes Thereom uses prior probability to calculate new probability.
+        At a high level, Bayes Thereom uses prior probability and the likelihood of it to calculate new probability (posterior).
     </p>
 
     <div class="important">    
-        <h4>Bayes Thereom</h4>  
+        <h4>Bayes Thereom</h4>
         $$
-            P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B)}
+            P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B)} = \frac{P(A \cap B)}{P(B)}
         $$
+
+        $P(A | B)$ = Posterior (what is the probability of case A given B?) <br>
+        $P(B | A)$ = Likelihood <br>
+        $P(A)$ = Probability of A (Prior) <br>
+        $P(B)$ = Probability of B (Marginalization) <br>
+        Range: [0, 1]
+    </div>
+
+    <div class="note">
+        <h4>Note</h4>
+        <p>
+            You might find $P(A \cap B) = P(A, \ B)$ which is the same thing.
+            Also, if you solve for $P(B|A)$, notice how Bayes is symmetric. By that same symmetry:
+            $$
+            P(A \cap B) = P(A | B) \cdot P(B) = P(B | A) \cdot P(A)
+            $$
+        </p>
+    </div>
+
+    <p>
+        The entire point is to update your posterior belief as with your prior belief. 
+        Your posterior will then become your prior. The prior is something that you come up with.
+        It could be from a distribution or by elite ball knowledge.
+    </p>
+
+    <p>
+        More importantly since we are working with mainly conditional probabilities,
+        the marginalization or $P(B)$ uses the <strong>law of total probability</strong>.
+        
+        <div class="important">
+        <h4>Law of Total Probability</h4>
+        $$
+        P(B) = \sum^k_{i=1} P(B | A_i) \cdot P(A_i)
+        $$
+        
+        <img class="image-center" src="../assets/images/stop_getting_spammed/total_prob.webp">
+        <div class="source">Source: 
+            <a href="https://www.geeksforgeeks.org/maths/mathematics-law-of-total-probability/">
+                GeeksforGeeks
+            </a>
+        </div><br>
+        
+        The probability of B occuring is the probability of B over all cases of A.
+        </div>
+    </p>
+
+    <p>
+        However, Bayes is not only just dependent on just A and B. We have have a bunch of variables.
+        
+        $$
+        P(A \cap B \cap C \cap D \cap \dots)
+        $$
+
+        To handle this, we can use the <strong>chain rule of probability</strong>:
+        
+        <div class="important">
+        <h4>Chain Rule of Probability</h4>
+        $$
+        P(A, B, C) = P(A, B | C) \cdot P(C) = P(A | B, C) \cdot P(B, C) \cdot P(C)
+        $$
+        </div>
+
+        You might wonder how we got from $P(A, B | C)$ to $P(A | B, C) \cdot P(B, C)$.
+        Here is a small workthrough:
+
+        $$
+        \begin{aligned}
+        P(A, B | C) &= \frac{P(A, B, C)}{P(C)} \qquad \qquad \qquad \qquad \qquad \text{Def. of Bayes} \\
+        P(A, B, C) &= P(A | B, C) \cdot P(B, C) \qquad \qquad \qquad \ \text{Chain Rule} \\
+        P(B, C) &= P(B | C) \cdot P(C) \qquad \qquad \qquad \qquad \ \ \ \text{Chain Rule} \\
+        P(A, B | C) &= \frac{P(A | B, C) P(B | C)  P(C)}{P(C)} \\
+        P(A, B | C) &= P(A | B, C) P(B | C) \qquad \qquad \qquad \ \ \ \ \ \text{Cancel $P(C)$} \\
+        \end{aligned}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Note</h4>
+        <p> The permutations are the same
+            $$P(A, B, C) = P(B, A, C) = P(C, B, A) = P(A, C, B) \dots$$
+        </p>
+    </div>
+
+    <hr>
+    
+    <h2>Bayes Nets</h2>
+    <p>
+        To understand why Brandon chooses Naive Bayes, we must first understand the limitations of Bayes.
+        We can see this through the use of Bayes Nets. 
+        <strong>Bayesian Networks</strong> allow us to map relationships between variables, estimating the likelihood of future events occuring
+        given hidden states. Take this example below. This is a Bayes Net. Each table / chain contains probabilities.
+    </p>
+
+    <img class="image-center" src="../assets/images/stop_getting_spammed/Bayes_Net_ex.png" style="width: 65%; height: auto;">
+    <div class="source">Source: CS3600 (Georgia Tech)</div>
+    <br>
+
+    <div class="note">
+        <h4>Note on Cardinalities</h4>
+        <ul>
+            <li>$|$Input Rows$|$ = mulitply cardinalities of parent blocks</li>
+            <li>$|$Input Cols$|$ = number of parents</li>
+            <li>$|$Output Cols$|$ = $|$child$|$</li>
+            <li>$|$Total Cols$|$ = $|$Input Cols$|$ + $|$Output Cols$|$</li>
+        </ul>
+    </div>
+
+    <p>
+        <strong>Information flow</strong> can be described as knowing belief of one variable helps update your belief about another one.
+        There are typically 3 types of information flow.    
+        
+        <ul>
+            <li>Pipe (A -> B -> C): If we don't know the middle (B), then we can use A tell us about B (information flows). However, the moment you know B, you don't need A (*).</li><br>
+            <li>Fork (A <- B -> C): If we don't know the middle (B), then we can use A to tell us about C, vice versa (information flows). However, the moment you know B, you don't need A / C (*).</li><br>
+            <li>Collider (A -> B <- C): If we don't know B, A and C tell us nothing about each other (no flow) but the moment we do, there is information flow (*).</li>
+        </ul>
+
+        Notice that these tell you about possible <strong>conditional independence</strong>.
+
+        <div class="important">
+            <h4>Conditional Independence (*)</h4>
+            <p>
+                $X$ and $Y$ are conditionally independent given $Z$ and $Y$ if $Y$ gives no additional information about $X$ if we know $Z$.
+                In other words $P(X | Y, Z)$ = $P(X | Z)$ if conditionally independent since knowing $Z$ means we can discard $Y$.
+            </p>
+        </div>
+    </p>
+
+    <p>
+        Lets do examples with the graph above: <br><br>
+        1. You pick a random rat from the group of worm-carrying rats. What is the probability that it is male?
+        $$
+        \begin{aligned}
+        P(M{=}t \mid W{=}t)
+        &= \frac{P(M{=}t, W{=}t)}{P(W{=}t)} \\[4pt]
+        P(W{=}t)
+        &= P(W{=}t \mid M{=}t)P(M{=}t) + P(W{=}t \mid M{=}f)P(M{=}f) \\[4pt]
+        &= (0.15)(0.3) + (0.01)(0.7) = 0.052 \\[4pt]
+        P(M{=}t, W{=}t)
+        &= P(W{=}t \mid M{=}t)P(M{=}t) = (0.15)(0.3) = 0.045 \\[4pt]
+        P(M{=}t \mid W{=}t)
+        &= \frac{0.045}{0.052} \approx 0.8654
+        \end{aligned}
+        $$
+
+        2. You pick a random rat from the group of rats that have the worm and are hot. What is the probability that it also has the virus? 
+
+        $$
+        \begin{aligned}
+        P(V{=}t \mid W{=}t, H{=}t)
+        &= \frac{P(V{=}t, W{=}t, H{=}t)}{P(W{=}t, H{=}t)} \\[4pt]
+        P(V{=}t, W{=}t, H{=}t)
+        &= P(H{=}t \mid W{=}t, V{=}t)P(W{=}t \mid V{=}t)P(V{=}t) \\[4pt]
+        P(W{=}t)
+        &= P(W{=}t \mid M{=}t)P(M{=}t) + P(W{=}t \mid M{=}f)P(M{=}f) \\[4pt]
+        &= (0.15)(0.3) + (0.01)(0.7) = 0.052 \\[4pt]
+        P(V{=}t, W{=}t, H{=}t)
+        &= (0.85)(0.052)(0.06) = 0.002652 \\[4pt]
+        P(W{=}t, H{=}t)
+        &= P(H{=}t \mid W{=}t)P(W{=}t) \\[4pt]
+        P(H{=}t \mid W{=}t)
+        &= P(H{=}t, V{=}t \mid W{=}t) + P(H{=}t, V{=}f \mid W{=}t) \\[4pt]
+        &= P(H{=}t \mid V{=}t, W{=}t)P(V{=}t \mid W{=}t)
+          + P(H{=}t \mid V{=}f, W{=}t)P(V{=}f \mid W{=}t) \\[4pt]
+        &= (0.85)(0.06) + (0.8)(0.94) = 0.803 \\[4pt]
+        P(W{=}t, H{=}t)
+        &= (0.803)(0.052) = 0.041756 \\[4pt]
+        P(V{=}t \mid W{=}t, H{=}t)
+        &= \frac{0.002652}{0.041756} \approx 0.0635
+        \end{aligned}
+        $$
+
+        <br>
+
+        3. You pick a random rat from the group of rats that are not hot yet are unresponsive. What is the probability that it has the virus?
+        $$
+        \begin{aligned}
+        P(V{=}t \mid U{=}t, H{=}f)
+        &= \frac{P(U{=}t, H{=}f, V{=}t)}{P(H{=}f, U{=}t)} \\[4pt]
+        P(U{=}t, H{=}f, V{=}t)
+        &= P(U{=}t \mid H{=}f, V{=}t)P(H{=}f \mid V{=}t)P(V{=}t) \\[4pt]
+        P(U{=}t \mid H{=}f, V{=}t)
+        &= P(U{=}t, C{=}t \mid H{=}f, V{=}t) + P(U{=}t, C{=}f \mid H{=}f, V{=}t) \\[4pt]
+        &= P(U{=}t \mid C{=}t, H{=}f)P(C{=}t \mid V{=}t)
+          + P(U{=}t \mid C{=}f, H{=}f)P(C{=}f \mid V{=}t) \\[4pt]
+        &= (0.4)(0.75) + (0.3)(0.25) = 0.375 \\[4pt]
+        P(H{=}f \mid V{=}t)
+        &= P(H{=}f \mid W{=}t, V{=}t)P(W{=}t) + P(H{=}f \mid W{=}f, V{=}t)P(W{=}f) \\[4pt]
+        P(W{=}t)
+        &= P(W{=}t \mid M{=}t)P(M{=}t) + P(W{=}t \mid M{=}f)P(M{=}f) \\[4pt]
+        &= (0.15)(0.3) + (0.01)(0.7) = 0.052,
+        \quad P(W{=}f)=0.948 \\[4pt]
+        P(H{=}f \mid V{=}t)
+        &= (0.15)(0.052) + (0.45)(0.948) = 0.4344 \\[4pt]
+        P(U{=}t, H{=}f, V{=}t)
+        &= (0.375)(0.4344)(0.06) = 0.009774 \\[4pt]
+        P(H{=}f, U{=}t)
+        &= P(H{=}f, U{=}t, V{=}t) + P(H{=}f, U{=}t, V{=}f) \\[4pt]
+        P(H{=}f, U{=}t, V{=}f)
+        &= P(U{=}t \mid H{=}f, V{=}f)P(H{=}f \mid V{=}f)P(V{=}f) \\[4pt]
+        P(U{=}t \mid H{=}f, V{=}f)
+        &= (0.4)(0.3) + (0.3)(0.7) = 0.33 \\[4pt]
+        P(H{=}f \mid V{=}f)
+        &= (0.2)(0.052) + (0.95)(0.948) = 0.911 \\[4pt]
+        P(H{=}f, U{=}t, V{=}f)
+        &= (0.33)(0.911)(0.94) = 0.2825922 \\[4pt]
+        P(H{=}f, U{=}t)
+        &= 0.009774 + 0.2825922 = 0.2923662 \\[4pt]
+        P(V{=}t \mid U{=}t, H{=}f)
+        &= \frac{0.009774}{0.2923662} \approx 0.0334
+        \end{aligned}
+        $$
+
+        Notice how marginalizing and summing across hidden variables (sandwiched variables) requires a bunch of extra steps. 
+        This becomes very computationally intensive. Thus, Bayes Nets are good for small datasets.
+        It would be easier to assume conditional independence and remove a lot of these terms. This is why
+        Brandon chose <strong>Naive Bayes</strong>.
+    </p>
+
+    <h2>Naive Bayes Classifiers - Spam Filter</h2>
+    <p>
+        One of the problems with Bayes Nets was that it was too computationally expensive to calculate all the terms.
+        Instead we can assume features are <strong>condtionally independent</strong>.
+
+        <div class="important">
+            <h4>Naive Bayes</h4>
+            We <strong>assume</strong> conditional independence aka the "naive" assumption.
+            <p>
+                $$
+                P(C \mid x_1,\dots,x_n)\propto P(C)\prod_{i=1}^{n}P(x_i\mid C)
+                $$
+            </p>
+        </div>
+
+        For numeric / continuous data, we can model each feature with a distribution such as a gaussian distribution
+        in the multivariate case (use $\sigma^2$ for the variance in 1D gaussian):
+
+        $$
+        \mu = \frac{1}{n}\sum_{i=1}^{n} x_i \\
+        \Sigma = \frac{1}{n}\sum_{i=1}^{n} (x_i - \mu)(x_i - \mu)^T \quad \text{Covariance Matrix}\\ 
+        \frac{1}{\sqrt{(2\pi)^d |\Sigma|}} \exp \left( -\frac{1}{2}(x - \mu)^T \Sigma^{-1} (x - \mu) \right)
+        $$
+
+        <div class="note">
+            <h4>Note</h4>
+            <p>The covariance matrix:
+                $$
+                \Sigma =
+                \begin{bmatrix}
+                \sigma_x^2 & \sigma_{xy} \\
+                \sigma_{xy} & \sigma_y^2
+                \end{bmatrix}
+                $$
+            </p>
+            <ul>
+                <li>Contains variances on the diagonal (controls spread).</li>
+                <li>Contains covariances on the off-diagonal (controls tilt / rotation).</li>
+            </ul>
+        </div>
+
+        However, here, we are trying to detect words like: job, summer, internship, work. 
+        Assuming conditional independence we get:
+        $$
+            P(\text{spam} | \text{job, summer, internship, work})
+            \propto P(\text{spam} | \text{job}) P(\text{spam} | \text{summer})
+            P(\text{spam} | \text{internship}) P(\text{spam} | \text{work})
+        $$
+
+        Notice how this is way simpler since we only depend on one feature at a time.
+        This allows Naive Bayes to do fast spam detection on larger datasets.
+        Naive bayes is also fast to train because it only requires a single pass 
+        through the data to calculate the probabilities.
+    </p>
+
+    <hr>
+
+    <h2>Conclusion</h2>
+    <p>
+        Now Brandon can put this project on his resume AND doesn't have to deal with Austin!
+    </p>
+
+    <img class="image-center" src="../assets/images/stop_getting_spammed/naive_bayes_end.png" style="width: 85%; height: auto;">
+        <div class="source">Source: Me :) 
     </div>
 
   <script>
