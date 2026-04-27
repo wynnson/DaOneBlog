@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Searching the Unknown</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Searching the Unknown</h1>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/graphs.gif">
+    <div class="source">Source: <a href="https://medium.com/generative-design/routing-with-graphs-5fb564b02a74">Danil Nagy</a></div>
+    
+    <h2>Primer: Pikachu and Rubik's Cubes</h2>
+    <p>
+        Over time we will solve rubik's cubes faster and faster. 
+        Soon we will be able to solve rubik's cubes in negative time.
+        Legend if we solve a rubik's cube fast enough we can travel back and time.
+        Bad actors travel back in time to do bad stuff
+        Pikachu knows this - and is going to prevent the creation of the rubik's cube to save the world.
+    </p>
+
+    <hr>
+
+    <h2>Searching for Solutions</h2>
+    <div class="important">
+        <strong>Search</strong> is defined by an initial state $s_0$ and goal state $G$. 
+        There are actions $A(s)$ that you can take in state $s$ ("state space").
+        We can take that action using $T(a, s)$ which results in a new state $s'$.
+    </div>
+
+    <p>
+        So how do we search for the goal state $G$? There are many different ways.
+        I will outline the popular ones with their psuedocode below.
+    </p>
+
+    <hr>
+
+    <h2><u>Unweighted Graphs</u></h2>
+
+    <h2>BFS (Breadth First Search)</h2>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/Breadth-First-Search-Algorithm.gif" style="width: 45%; height: auto;">
+    <div class="source">Source: <a href="https://commons.wikimedia.org/wiki/File:Breadth-First-Search-Algorithm.gif">Wikimedia Commons</a></div><br>
+    
+    <p>
+        Go level by level / expand evenly from some original source node ($s_0$) until reaching $G$. 
+        When doing this, we build a backtracking table to remember which path we took.
+        This is <strong>first in first out (FIFO)</strong> using a queue.
+        In this case, with an unweighted graph, we are <u> guaranteed to find the optimum</u> since we visit the shallowest nodes first.
+    </p>
+
+    <p>
+        $$  
+        \begin{array}{l}
+        \mathbf{define}\; bfs(): \\[4pt]
+        \qquad \begin{aligned}
+        &\mathbf{if}\; Goal(s_0),\; \mathbf{return}\; [] \\[4pt]
+        &q \;=\; \text{new Queue},\; bt \;=\; \text{new Map} \\[4pt]
+        &q.\text{push\_back}(s_0),\; bt[s_0] = (\text{None},\text{None}) \\[4pt]
+        &\mathbf{while}\; q\;\text{is not empty}: \\[4pt]
+        &\qquad s = q.\text{pop\_front}() \\[4pt]
+        &\qquad \mathbf{for\ all}\; a\;\text{in}\; A(s): \\[4pt]
+        &\qquad\qquad s' = T(a, s) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; s'\;\text{is in}\; bt,\; \mathbf{continue} \\[4pt]
+        &\qquad\qquad bt[s'] = (a, s) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; Goal(s'),\; \mathbf{return}\; backtrack(s_0, s', bt) \\[4pt]
+        &\qquad\qquad q.\text{push\_back}(s') \\[4pt]
+        &\mathbf{return}\; \text{failure}
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <br>
+    <p>Upon finding the goal state, we can backtrack for the path:</p>
+
+    <p>
+        $$
+        \begin{aligned}
+        &\mathbf{define}\; backtrack(s_0, s_f, bt): \\[4pt]
+        &\qquad q = \text{new List} \\[4pt]
+        &\qquad s = s_f \\[4pt]
+        &\qquad \mathbf{while}\; s \neq s_0: \\[4pt]
+        &\qquad\qquad (a, s) = bt[s] \\[4pt]
+        &\qquad\qquad q.\text{push\_front}(a) \\[4pt]
+        &\qquad \mathbf{return}\; q
+        \end{aligned}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(b^d)$</li>
+            <li>Space: $O(b^d)$</li>
+        </ul>
+        Where $b$ is the branching factor and $d$ is the shallowest depth.
+    </div>
+
+    <h2>Bidirectional BFS</h2>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/Bidirectional.png" style="width: 45%; height: auto;">
+    <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+    
+    <p>
+        Notice how BFS has a time complexity of $O(b^x)$. We already know that the solved state of a rubik's cube is 
+        when all colors are the same on each side. So we already know where and what the goal is. 
+        We just don't know the path to get there. With bidirectional, we can start at the goal AND initial states 
+        and try to connect both ends. The branch out from each is called a <strong>frontier</strong>. 
+        We are looking for a frontier match using a front $s_0$ / back $G$, resulting in time complexity of $2b^{\frac{n}{2}}$.
+    </p>
+
+    <p>
+        $$
+        \begin{aligned}
+        &\mathbf{define}\; bidirectional\_bfs(s_0, G): \\[4pt]
+        &\qquad q_f.\text{push\_back}((s_0, 0)),\; bt_f[s_0] = (\text{None}, 0),\; q_b.\text{push\_back}((G, 0)),\; bt_b[G] = (\text{None}, 0) \\[4pt]
+        &\qquad \mu = \infty \\[4pt]
+        &\qquad \mathbf{while}\; q_f\;\text{and}\; q_b\;\text{are not empty}: \\[4pt]
+        &\qquad\qquad \mathbf{if}\; forward.\text{peek}[1] + backward.\text{peek}[1] \ge \mu,\; \mathbf{break} \\[4pt]
+        &\qquad\qquad \text{Alternate between forward and backward search} \\[4pt]
+        &\qquad\qquad (node, cost) = queue.\text{pop}() \\[4pt]
+        &\qquad\qquad \mathbf{for\ all}\; child \in A(node): \\[4pt]
+        &\qquad\qquad\qquad \mathbf{if}\; child\;\text{is in}\; bt,\; \mathbf{continue} \\[4pt]
+        &\qquad\qquad\qquad bt[child] = (node, cost + 1) \\[4pt]
+        &\qquad\qquad\qquad \mathbf{if}\; child\;\text{is in opposite } bt\;\mathbf{and}\;\text{distance through child} < \mu: \\[4pt]
+        &\qquad\qquad\qquad\qquad center = child \\[4pt]
+        &\qquad\qquad\qquad\qquad \mu = \text{distance through child} \\[4pt]
+        &\qquad\qquad\qquad \mathbf{else}\; queue.\text{push}((child, cost + 1)) \\[4pt]
+        &\qquad \mathbf{if}\; center = \text{None}:\; \mathbf{return}\; \text{failure} \\[4pt]
+        &\qquad \text{Use } bt_f \text{ and } bt_b \text{ to recover actions from } s_0 \text{ through } center \text{ to } G
+        \end{aligned}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(2b^{\frac{x}{2}})$</li>
+            <li>Space: $O(2b^{\frac{x}{2}})$</li>
+        </ul>
+        <p>
+        Be aware that we should not break too early. 
+        We only break if $n_f + n_b \ge \mu$. $n_f$ and $n_b$ represents the depth of frontier front and back respectfully.
+        $\mu$ represents our current best complete path $n_f + n_b$ of some previous path.
+        Because BFS goes level by level,
+        if our new path depth doesn't shrink, then we know we already found our minimum.
+        </p>
+    </div>
+
+    <h2>DFS (Depth First Search)</h2>
+    <img class="image-center" src="../assets/images/searching_the_unknown/Depth-First-Search.gif" style="width: 45%; height: auto;">
+    <div class="source">Source: <a href="https://commons.wikimedia.org/wiki/File:Depth-First-Search.gif">Wikimedia Commons</a></div><br>
+    
+    <p>
+        What if we swap the FIFO queue for a last in first out (<strong>LIFO</strong>) stack? We get depth first search (DFS).
+        In DFS, we explore one path as deeply as possible and then go to another if it doesn't work out. 
+        This means the solution we find <u>might not be the optimum</u>.
+    </p>
+
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; dfs(): \\[4pt]
+        \qquad \begin{aligned}
+        &\mathbf{if}\; Goal(s_0),\; \mathbf{return}\; [] \\[4pt]
+        &q = \text{new Stack} \\[4pt]
+        &q.\text{push}((s_0, [])) \\[4pt]
+        &\mathbf{while}\; q\;\text{is not empty}: \\[4pt]
+        &\qquad (s, path) = q.\text{pop}() \\[4pt]
+        &\qquad \mathbf{for\ all}\; a\;\text{in}\; A(s): \\[4pt]
+        &\qquad\qquad s' = T(a, s) \\[4pt]
+        &\qquad\qquad p' = path + [a] \\[4pt]
+        &\qquad\qquad \mathbf{if}\; Goal(s'),\; \mathbf{return}\; p' \\[4pt]
+        &\qquad\qquad q.\text{push}((s', p')) \\[4pt]
+        &\mathbf{return}\; \text{failure}
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(2b^{\frac{m}{2}})$</li>
+            <li>Space: $O(bm)$</li>
+        </ul>
+        Where m is the max depth of a tree. 
+        If a tree is infinite, DFS might never find a solution.
+    </div>
+
+    <h4>Extension: Iterative Deepening DFS (IDDFS)</h4>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/iterative deepening DFS.png" style="width: 65%; height: auto;">
+    <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+
+    <p>
+        Run DFS repeatedly at increasing depth limits $d$. This caps the max depth $m$ to $d$ where $d \ll m$.
+        This is useful because we have the same time complexity as BFS but better space complexity.
+    </p>
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(b^d)$</li>
+            <li>Space: $O(bd)$</li>
+        </ul>
+        $d$ is the depth limit (shallowest depth).
+    </div>
+
+    <h2>Best First (Informed) Search</h2>
+    <img class="image-center" src="../assets/images/searching_the_unknown/Greedy-search-path-example.gif">
+    <div class="source">Source: <a href="https://commons.wikimedia.org/wiki/File:Depth-First-Search.gif">Wikimedia Commons</a></div><br>
+    
+    <p>
+        What if we take a greedy approach: let's use the closest of the states. 
+        This means we need a sorted data structure to take the closest.
+        We can use a priority queue (min heap) to do this.
+    </p>
+
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; best\_first(): \\[4pt]
+        \qquad \begin{aligned}
+        &\mathbf{if}\; Goal(s_0),\; \mathbf{return}\; [] \\[4pt]
+        &q = \text{new PriorityQueue},\; bt = \text{new Map} \\[4pt]
+        &q.\text{push}((s_0, 0)),\; bt[s_0] = (\text{None},\text{None}) \\[4pt]
+        &\mathbf{while}\; q\;\text{is not empty}: \\[4pt]
+        &\qquad s = q.\text{pop}() \\[4pt]
+        &\qquad \mathbf{for\ all}\; a\;\text{in}\; A(s): \\[4pt]
+        &\qquad\qquad s' = T(a, s) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; s'\;\text{is in}\; bt,\; \mathbf{continue} \\[4pt]
+        &\qquad\qquad bt[s'] = (a, s) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; Goal(s'),\; \mathbf{return}\; backtrack(s_0, s', bt) \\[4pt]
+        &\qquad\qquad d = \text{estimated\_distance\_to\_nearest\_goal}(s') \\[4pt]
+        &\qquad\qquad q.\text{push}((s', d)) \\[4pt]
+        &\mathbf{return}\; \text{failure}
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(b^m)$</li>
+            <li>Space: $O(b^m)$</li>
+        </ul>
+        Since we are greedy, we do not guarantee to find the optimum.
+    </div>
+
+    <hr>
+
+    <h2><u>Weighted Graphs</u></h2>
+    <p>
+        The problem is that rubik's cubes rotations are not the same.
+        You notice that there is different friction coefficients associated with each side.
+        Your machine is able to pick up the costs associated with each turn. 
+        Now we need different methods to search for our state.
+    </p>
+    
+    <h2>UCS (Uniform Cost Search)</h2>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/ucs-gif.gif">
+    <div class="source">Source: <a href="https://github.com/amir-aghdam/UCS-and-A-star-search">Amir Aghdam</a></div><br>
+    
+    <p>
+        <strong>UCS</strong>, or uniform cost search is BFS but sorted by path cost (using a min heap / priority queue) instead of depth.
+    </p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; ucs(): \\[4pt]
+        \qquad \begin{aligned}
+        &bt = \text{new Map},\; visited = \text{new Set} \\[4pt]
+        &q = \text{new PriorityQueue} \\[4pt]
+        &q.\text{insert}((s_0, 0)) \\[4pt]
+        &\mathbf{while}\; (s, c) = q.\text{pop}(): \\[4pt]
+        &\qquad \mathbf{if}\; Goal(s),\; \mathbf{return}\; backtrack(s, bt) \\[4pt]
+        &\qquad visited.\text{add}(s) \\[4pt]
+        &\qquad \mathbf{for\ all}\; a\;\text{in}\; A(s): \\[4pt]
+        &\qquad\qquad (s', c') = T(a, s) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; s'\;\in\; visited,\; \mathbf{continue} \\[4pt]
+        &\qquad\qquad cost = c + c' \\[4pt]
+        &\qquad\qquad \mathbf{if}\; q.\text{insert\_or\_decrease}(s', cost): \\[4pt]
+        &\qquad\qquad\qquad bt[s'] = (a, s) \\[4pt]
+        &\mathbf{return}\; \text{failure}
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O\left(b^{1+\lfloor C^*/\epsilon \rfloor}\right)$</li>
+            <li>Space: $O\left(b^{1+\lfloor C^*/\epsilon \rfloor}\right)$</li>
+        </ul>
+        Where $C*$ is the optimal cost and $\epsilon$ represents the cheapest edge cost.
+    </div>
+
+    <h2>Bidirectional UCS</h2>
+    <p>Similar to bidirectional BFS, we can do bidirectional UCS:</p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; bidirectional\_ucs(): \\[4pt]
+        \qquad \begin{aligned}
+        &\text{Create } bt,\; queue,\; visited \text{ for forward and backward } (bt[state] = (prev, cost)) \\[4pt]
+        &\mathbf{while}\; \text{forward and backward queues are not empty}: \\[4pt]
+        &\qquad \text{Alternate between popping } s \text{ from forward and backward queues} \\[4pt]
+        &\qquad \text{Add } s \text{ to visited, let } c \text{ be cost to get to } s \\[4pt]
+        &\qquad \mathbf{for\ all}\; neighbor, t\;\text{in}\; s.\text{actions}: \\[4pt]
+        &\qquad\qquad \mathbf{if}\; neighbor \in other.bt: \\[4pt]
+        &\qquad\qquad\qquad r = c + t + other.bt[neighbor][1] \\[4pt]
+        &\qquad\qquad\qquad \mathbf{if}\; r < \mu: \\[4pt]
+        &\qquad\qquad\qquad\qquad bridge = (s, neighbor)\; (\text{or reverse}),\; \mu = r \\[4pt]
+        &\qquad\qquad \mathbf{else}: \\[4pt]
+        &\qquad\qquad\qquad \mathbf{if}\; c + t < bt[neighbor][1],\; \text{update } bt \text{ and queue} \\[4pt]
+        &\qquad \mathbf{return}\; backtrack(fbt, rbt, bridge)
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+    <p>We will also backtrack:</p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; backtracking(fbt, rbt, bridge): \\[4pt]
+        \qquad \begin{aligned}
+        &result = [] \\[4pt]
+        &s = bridge[0] \\[4pt]
+        &\mathbf{while}\; s \neq \text{None}: \\[4pt]
+        &\qquad result.\text{push\_front}(s) \\[4pt]
+        &\qquad s = fbt[s][0] \\[4pt]
+        &s = bridge[1] \\[4pt]
+        &\mathbf{while}\; s \neq \text{None}: \\[4pt]
+        &\qquad result.\text{push\_back}(s) \\[4pt]
+        &\qquad s = rbt[s][0] \\[4pt]
+        &\mathbf{return}\; result
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O\left(b^{C^*/(2\epsilon)}\right)$</li>
+            <li>Space: $O\left(b^{C^*/(2\epsilon)}\right)$</li>
+        </ul>
+        Similar to bidirectional BFS, we stop when the current path is more expensive than the cheapest path: $r_f + r_b \ge \mu$.
+    </div>
+
+    <div class="important">
+        <h4>Greedy is not always good.</h4><br>
+        <img class="image-center" src="../assets/images/searching_the_unknown/greedy_bad.png" style="width: 65%; height: auto;">
+        <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+        <p>
+            Note that for algorithms that use some sort of priority, being greedy can mean taking a bunch of short routes that add up to an objectively longer route.
+            Try not to get baited.
+        </p>
+    </div>
+
+    <h2>A* Search</h2>
+    <img class="image-center" src="../assets/images/searching_the_unknown/a-star.gif">
+    <div class="source">Source: <a href="https://github.com/npretto/pathfinding">npretto</a></div><br>
+    <p>
+        A* is an extension of UCS but with a heuristic $h(n)$.
+        If UCS provides the actual cost $g(n)$ from start to n, 
+        then A* priority is sorted by $f(n) = g(n) + h(n) = \text{UCS + heuristic}$.
+        UCS is A* with a heuristic of 0 for each action (no heuristic).
+    </p>
+
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; a\_star(): \\[4pt]
+        \qquad \begin{aligned}
+        &q = \text{new PriorityQueue},\; bt = \text{new Map} \\[4pt]
+        &q.\text{insert}((s_0, 0 + h(s_0))),\; bt[s_0] = (\text{NoState}, \text{NoAction}, 0) \\[4pt]
+        &\mathbf{while}\; (s, \_) = q.\text{pop}(): \\[4pt]
+        &\qquad \mathbf{if}\; Goal(s),\; \mathbf{return}\; backtrack(s, bt) \\[4pt]
+        &\qquad (\_, \_, g) = bt[s] \\[4pt]
+        &\qquad \mathbf{for\ all}\; a\;\text{in}\; A(s): \\[4pt]
+        &\qquad\qquad (s', c') = T(a, s) \\[4pt]
+        &\qquad\qquad cost = g + c' \\[4pt]
+        &\qquad\qquad \mathbf{if}\; s'\;\notin\; bt\;\mathbf{or}\; cost < bt[s'].\text{cost}: \\[4pt]
+        &\qquad\qquad\qquad estimate = cost + h(s') \\[4pt]
+        &\qquad\qquad\qquad q.\text{insert\_or\_decrease}(s', estimate) \\[4pt]
+        &\qquad\qquad\qquad bt[s'] = (a, s, cost) \\[4pt]
+        &\mathbf{return}\; \text{failure}
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(b^m)$</li>
+            <li>Space: $O(b^m)$</li>
+        </ul>
+        A* gets terminated when the goal node is popped off the priority queue (if admissible*). 
+        This is because we searched for the optimal first so we guarantee everything after will not be as good.
+    </div>
+
+    <p>
+        This allows the <strong>search contour</strong> for A* to look skewed.
+        This is because A* knows that it should search certain paths more because of the heuristic.
+        It is kind of like a trained sniffer dog searching for leads. 
+        While UCS searches the cheapest, it searches pretty uniformly.
+    </p>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/search_contours.png" style="width: 65%; height: auto;">
+    <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+
+    <div class="important">
+        <h4>Heuristics</h4>
+        <p>A* will always get the cheapest route if heuristic, $h(n)$ is <strong>admissible</strong>*.</p>
+        <p>
+            Admissible means that it will never overestimate the cost:
+            $$
+                h^*(s) = \text{remaining cost to goal} \\
+                h(n) \le h^*(n) \quad \forall n
+            $$
+            In other words our heuristic shouldn't make us think a good path is bad.
+        </p>
+        <p>
+            A <strong>consistent heuristic</strong> or monotonic heuristic means our heuristic does not contradict neighbors:
+            $$
+                h(N) \le c(N, P) + h(P) \quad \text{triangle inequality}
+            $$ 
+            This means that for a heuristic to be consistent, for some node $N$, the priority must be less 
+            than the cost from $N$ to another node $P$ + heuristic for $P$.
+            In other words, our heuristic estimate should not suddenly improve more than the cost of that step.
+        </p>
+        <p>
+            There are <u>2 types of heuristics</u> for searching: 
+            <ul>
+                <li><strong>front to front </strong>(hueristic frontier to heuristic frontier)</li>
+                <li><strong>front to back</strong> (heuristic fronter to end goal)</li>
+            </ul>
+        </p>
+    </div>
+
+    <h2>Bidirectional A* Search</h2>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; bidirectional\_a\_star(): \\[4pt]
+        \qquad \begin{aligned}
+        &\text{Create } bt,\; queue \text{ for forward and backward } (bt[state] = (prev, cost)) \\[4pt]
+        &\mathbf{while}\; \text{forward\_queue and backward\_queue are not empty}: \\[4pt]
+        &\qquad \text{Pop } s \text{ from the queue with lowest priority} \\[4pt]
+        &\qquad \text{Let } c \text{ be cost to get to } s \\[4pt]
+        &\qquad \mathbf{for\ all}\; neighbor, t\;\text{in}\; s.\text{actions}: \\[4pt]
+        &\qquad\qquad \mathbf{if}\; neighbor \in other.bt: \\[4pt]
+        &\qquad\qquad\qquad r = c + t + other.bt[neighbor][1] \\[4pt]
+        &\qquad\qquad\qquad \mathbf{if}\; r < \mu: \\[4pt]
+        &\qquad\qquad\qquad\qquad bridge = (s, neighbor)\; (\text{or reverse}),\; \mu = r \\[4pt]
+        &\qquad\qquad \mathbf{else}: \\[4pt]
+        &\qquad\qquad\qquad \mathbf{for\ all}\; x \in other.queue: \\[4pt]
+        &\qquad\qquad\qquad\qquad \text{Update priority for } x \text{ using } bt[neighbor] + h(neighbor, x) + other.bt[x] \\[4pt]
+        &\qquad\qquad\qquad\qquad \text{Note shortest estimate as } p \\[4pt]
+        &\qquad\qquad\qquad \text{Update (if necessary) neighbor's place in queue using } p \\[4pt]
+        &\qquad\qquad\qquad \text{Update (if necessary) } bt[neighbor] \text{ using } c + t \\[4pt]
+        &\qquad \mathbf{return}\; backtrack(fbt, rbt, bridge)
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(2b^{\frac{m}{2}})$</li>
+            <li>Space: $O(2b^{\frac{m}{2}})$</li>
+        </ul>
+        Bidirectional A* stops similarly to the other bidirectional methods:
+        $r_f \ge \mu, \ r_b \ge \mu$
+    </div>
+
+    <h2>Comparison of weighted search algos</h2>
+    <ul>
+        <li>A* -> strong baseline with good heuristic</li>
+        <li>Bi-UCS -> best + fastest without heuristic</li>
+        <li>Front-to-front -> too expensive (because we have to check a node to every node in the other frontier)</li>
+        <li>Front-to-back -> best real world (only checks opposite endpoint)</li>
+    </ul>
+
+    <hr>
+
+    <h2>Conclusion</h2>
+    <p>
+        Unfortunately, after a LOT of research, Pikachu was unable to find a search algorithm fast enough to travel back in time.
+        This is still an area of active research so Pikachu will keep looking.
+    </p>
+
+    <img class="image-center" src="../assets/images/searching_the_unknown/pika_time_machine.jpg" style="width: 65%; height: auto;">
+    <div class="source">Source: Me :)</div><br>
+    
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
