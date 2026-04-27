@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Traveller (TSP)</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Welcome Traveller (TSP)</h1>
+    
+    <br>
+    <img class="image-center" src="../assets/images/welcome_traveller/utilitygraph.png" style="width: 65%; height: auto;">
+    <div class="source">Source: <a href="https://www.cs.cmu.edu/~15281-s23/coursenotes/localsearch/index.html">CMU AI</a></div>
+
+    <h2>Primer: Pikachu walking to Johto</h2>
+    <p>
+        Pikachu is reading a map. 
+        He is trying to find the shortest path to Johto while visiting all the cities along the way.
+        At the end Pikachu needs to return home to Kanto.
+        Pikachu hates wasting time so he wants the shortest route.
+        He is like a travelling salesman without the salesman. 
+        How does he do this?
+        We can use classical TSP algorithms.
+    </p>
+
+    <hr>
+
+    <h2>TSP Problem</h2>
+    <p>
+        There are $n$ cities. 
+        Between any 2 cities, there is a distance $d(c_i, c_j)$.
+        Find the shortest path that visits every city and returns to the starting city.
+    </p>
+    <div class="note">
+        This is a NP-complete problem (no polynomial time solution).
+    </div>
+
+    <h2>2 Opt (Hill Climbing)</h2>
+    <img class="image-center" src="../assets/images/welcome_traveller/2opt.gif">
+    <div class="source">Source: <a href="https://allaboutalgorithms.com/improvement-heuristics-for-the-traveling-salesman-problem-in-python-d89c07f218b2">Dr. Robert Kubler</a></div><br>
+
+    <p>
+        Find 2 random cities. Swap them. Does it improve our shortest path?
+        Keep repeating until we see no improvement.
+    </p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; better\_neighbor(s): \\[4pt]
+        \qquad \begin{aligned}
+        &improvement = 0 \\[4pt]
+        &\mathbf{for}\; i\;\text{in}\; [0, \ldots, n-3]: \\[4pt]
+        &\qquad p_i = s[i] \\[4pt]
+        &\qquad \mathbf{for}\; j\;\text{in}\; [i+2, \ldots, n-1]: \\[4pt]
+        &\qquad\qquad p_{i+} = s[i+1] \\[4pt]
+        &\qquad\qquad p_j = s[j] \\[4pt]
+        &\qquad\qquad p_{j+} = s[(j+1)\;\text{mod}\; n] \\[4pt]
+        &\qquad\qquad old = d(p_i, p_{i+}) + d(p_j, p_{j+}) \\[4pt]
+        &\qquad\qquad new = d(p_i, p_j) + d(p_{i+}, p_{j+}) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; new < old: \\[4pt]
+        &\qquad\qquad\qquad reverse(s, i+1, j) \\[4pt]
+        &\qquad\qquad\qquad improvement = improvement + (old - new) \\[4pt]
+        &\mathbf{return}\; improvement
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Note</h4>
+        This strategy of 2 opt is called <strong>hill climbing</strong>.
+        It uses ONE random circuit and solves it. 
+        However, the starting circuit determines the outcome of 2 opt, leaving us in a local min / max.
+    </div>
+
+    <img class="image-center" src="../assets/images/welcome_traveller/local_minmax.png" style="width: 65%; height: auto;">
+    <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+
+    <h2>Random Restarts</h2>
+    <p>
+        Instead of picking 1 random circuit, let's pick $n$ random circuits and perform 2 opt on them.
+        We'll take the shortest path from all these circuits.
+    </p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; random\_restarts(n): \\[4pt]
+        \qquad \begin{aligned}
+        &shortest\_dist = \infty \\[4pt]
+        &shortest\_circuit = \text{None} \\[4pt]
+        &\mathbf{for}\; k\;\text{in}\; [1, \ldots, n]: \\[4pt]
+        &\qquad circuit = \text{random\_starting\_circuit}() \\[4pt]
+        &\qquad \mathbf{while}\; better\_neighbor(circuit) > 0:\\[4pt]
+        &\qquad\qquad \text{continue improving } circuit \\[4pt]
+        &\qquad dist = \text{circuit\_distance}(circuit) \\[4pt]
+        &\qquad \mathbf{if}\; dist < shortest\_dist: \\[4pt]
+        &\qquad\qquad shortest\_dist = dist \\[4pt]
+        &\qquad\qquad shortest\_circuit = circuit \\[4pt]
+        &\mathbf{return}\; shortest\_circuit
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <h2>Simulated Annealing</h2>
+
+    <img class="image-center" src="../assets/images/welcome_traveller/anneal.gif">
+    <div class="source">Source: <a href="https://www.biostat.jhsph.edu/~iruczins/teaching/misc/annealing/animation.html">John Hopkins</a></div><br>
+
+    <p>
+        Another way to get the shortest path and not get stuck in a local min / max is annealing.
+        This means that during 2opt, we occasionally do bad swaps (if chance we accept is greater than a random probability).
+        This can help us avoid a local optimum.
+    </p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; simulated\_annealing(s_0, c, k_{\max}): \\[4pt]
+        \qquad \begin{aligned}
+        &s = s_0 \\[4pt]
+        &g = \text{Cost}(s_0) \\[4pt]
+        &\mathbf{for}\; k\;\text{in}\; [1, \ldots, k_{\max}]: \\[4pt]
+        &\qquad s' = \text{neighbor}(s) \\[4pt]
+        &\qquad g' = \text{Cost}(s') \\[4pt]
+        &\qquad \mathbf{if}\; g' < g: \\[4pt]
+        &\qquad\qquad s = s',\; g = g' \\[4pt]
+        &\qquad \mathbf{else}: \\[4pt]
+        &\qquad\qquad T = c\left(1 - \frac{k}{k_{\max}+1}\right) \\[4pt]
+        &\qquad\qquad p = e^{(g-g')/T} \\[4pt]
+        &\qquad\qquad \mathbf{if}\; p > \text{random}(): \\[4pt]
+        &\qquad\qquad\qquad s = s',\; g = g' \\[4pt]
+        &\mathbf{return}\; s
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <h2>Beam Search</h2>
+    <p>
+        Earlier, hill climb picked the best neighbor. Thus, we did beam search with $n = 1$.
+        Now, we want to not tunnel vision on that sole best neighbor to avoid a local optimum.
+        We can keep a top $n$. This is shown in NLP.
+        We often keep the top $n$ most probable words so that we have more options.
+    </p>
+
+    <img class="image-center" src="../assets/images/welcome_traveller/Beam_search.gif">
+    <div class="source">Source: <a href="https://commons.wikimedia.org/wiki/File:Beam_search.gif">Wikimedia Commons</a></div>
+
+    <h2>Genetic Algorithms</h2>
+    <p>
+        Similar idea to survival of the fittest.
+        We will breed, mutate, and cull causing "evolution".
+    </p>
+    <ol>
+        <li><strong>Initialize:</strong> Create a random population of solutions.</li>
+        <li><strong>Evaluate fitness:</strong> Score how good each solution is.</li>
+        <li><strong>Select parents:</strong> Better solutions are more likely to reproduce.</li>
+        <li><strong>Crossover:</strong> Combine parts of two parents to make children.</li>
+        <li><strong>Mutation:</strong> Randomly change small parts of a child.</li>
+        <li><strong>Cull:</strong> Keep the best solutions and remove weak ones.</li>
+        <li><strong>Repeat:</strong> Continue until a solution is good enough.</li>
+    </ol>
+
+    <p>
+        The goal is to explore many possible solutions while slowly pushing the population
+        toward better ones.
+    </p>
+    <div class="note">
+        <h4>Challenges of genetic algos:</h4>
+        <p>Finding good representations is hard</p>
+        <ol>
+            <li>Crossover shouldn't be consistently deadly</li>
+            <li>Mutation shouldn't be consistently deadly</li>
+        </ol>
+        <p>Lots of hyperparameter tuning:</p>
+        <ol>
+            <li>How many before culling?</li>
+            <li>How many do we cull?</li>
+            <li>How much mutation is too much?</li>
+        </ol>
+    </div>
+    
+    <h2>Branch and Bound</h2>
+    <p>
+        In all these, we explore every possible solution. 
+        However, to cap this, we can use <strong>branch and bound</strong>.
+        We can use minimum spanning tree (MST) algorithms to provide a lower bound and upper bound.
+        We do not need to visit the branches whose lower bound is already better than the best upper bound.
+        In other words, in the best case, this branch is worse than a solution we already found. 
+
+        $$
+        LB(branch) \ge UB_{best} \Rightarrow \text{prune}
+        $$
+
+        <div class="important">
+            <h4>Bounds</h4>
+            <ul>
+                <li>$LB = g(\text{current path}) + MST(\text{endpoints + remaining cities})$</li>
+                <li>$UB = g(\text{current path}) + 2 \cdot MST(\text{endpoints + remaining cities})$</li>
+            </ul>
+            <p>
+                $2 \cdot MST$ gaurantees a valid TSP tour. 
+                This is because the MST guarantees we visit every node.
+                $2 \cdot MST$ means we can walk back to the beginning.
+            </p>
+
+        </div>
+
+        Here are 2 common MST algorithms:
+    </p>
+
+    <h2>Prims</h2>
+    <img class="image-center" src="../assets/images/welcome_traveller/prims.gif">
+    <div class="source">Source: <a href="https://en.wikipedia.org/wiki/Prim%27s_algorithm">Wikipedia</a></div><br>
+    <p>Choose random vertex, connect closest points until we get a MST:</p>
+
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; prims(S): \\[4pt]
+        \qquad \begin{aligned}
+        &\text{Given } S = \{c_1, \ldots, c_n\} \\[4pt]
+        &v = \text{pop}(S) \\[4pt]
+        &C = \text{PriorityQueue},\; Closest = \text{Map} \\[4pt]
+        &\mathbf{for\ all}\; s \in S: \\[4pt]
+        &\qquad C.\text{add}(s, d(s, v)) \\[4pt]
+        &\qquad Closest[s] = v \\[4pt]
+        &Result = \text{new Set} \\[4pt]
+        &\mathbf{while}\; S\;\text{is not empty}: \\[4pt]
+        &\qquad u = \text{pop\_least}(C) \\[4pt]
+        &\qquad S.\text{remove}(u) \\[4pt]
+        &\qquad Result.\text{add}(u, Closest[u]) \\[4pt]
+        &\qquad \mathbf{for\ all}\; w \in S: \\[4pt]
+        &\qquad\qquad C.\text{decrease}(w, d(w, u)) \\[4pt]
+        &\mathbf{return}\; Result
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <h2>Kruskals</h2>
+    <img class="image-center" src="../assets/images/welcome_traveller/kruskals.gif" style="width: 55%; height: auto;">
+    <div class="source">Source: <a href="https://algodaily.com/lessons/kruskals-algorithm">Algo Daily</a></div><br>
+    <p>Keep connecting the shortest distances until we get a MST:</p>
+    <p>
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; kruskals(S): \\[4pt]
+        \qquad \begin{aligned}
+        &\text{Given } S = \{c_1, \ldots, c_n\} \\[4pt]
+        &E = \text{all possible edges using } S \\[4pt]
+        &E = \text{sort\_ascending}(E) \\[4pt]
+        &Result = \text{new Set} \\[4pt]
+        &\text{Create a set } S_i \text{ for each } c_i \\[4pt]
+        &\mathbf{while}\; \text{there is more than one set}: \\[4pt]
+        &\qquad (u, v) = \text{pop\_least}(E) \\[4pt]
+        &\qquad \mathbf{if}\; u\;\text{and}\; v\;\text{are not in same set}: \\[4pt]
+        &\qquad\qquad \text{Merge the two sets} \\[4pt]
+        &\qquad\qquad Result.\text{add}(u, v) \\[4pt]
+        &\mathbf{return}\; Result
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <hr>
+
+    <h2>Conclusion</h2>
+    <p>
+        Pikachu can now find the shortest path from Kanto to Johto and back without wasting time.
+        How? He used one of the algorithms above!
+    </p>
+
+    <img class="image-center" src="../assets/images/welcome_traveller/pikatravel.jpg" style="width: 65%; height: auto;">
+    <div class="source">Source: Me :)</div><br>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
