@@ -301,8 +301,9 @@
       $$
       \begin{aligned}
       L(\theta) = E(\theta) &= \frac{1}{N} \sum_i^N (y - \hat{y})^2 \\
-      E(\theta) &= (y - \hat{y})^2 \\
-            \nabla E_{\theta}(\theta) &= -(y - f(x)) \frac{\partial f(x)}{\partial \theta}, \quad \text{$f(x) = \hat{y}$}\\
+      E(\theta) &= (y - \hat{y})^2 \qquad \text{one data point at the end}\\ 
+      E(\theta) &= \frac{1}{2} (y - \hat{y})^2 \quad \ \text{multiply by constant doesn't change result (easier opt)} \\
+      \nabla E_{\theta}(\theta) &= -(y - f(x)) \frac{\partial f(x)}{\partial \theta}, \quad \text{$f(x) = \hat{y}$}\\
       \end{aligned}
       $$
 
