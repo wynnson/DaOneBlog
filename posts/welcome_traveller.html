@@ -271,6 +271,76 @@
         $$
     </p>
 
+    <h2>Comparison</h2>
+    <table>
+    <thead>
+        <tr>
+        <th>Algorithm</th>
+        <th>Main Idea</th>
+        <th>Pros</th>
+        <th>Cons</th>
+        <th>Best Use Case</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td><strong>Hill Climbing</strong></td>
+        <td>Always move to the best better neighbor.</td>
+        <td>
+            Simple, fast, easy to implement.
+        </td>
+        <td>
+            Gets stuck in local minima/maxima. No randomness or backup plan.
+        </td>
+        <td>
+            When the search space is smooth and local choices are usually good.
+        </td>
+        </tr>
+
+        <tr>
+        <td><strong>Random Restart</strong></td>
+        <td>Run hill climbing many times from different random starts.</td>
+        <td>
+            Better chance of escaping local minima. Still simple.
+        </td>
+        <td>
+            Can waste time restarting. No smart memory between runs.
+        </td>
+        <td>
+            When hill climbing works sometimes, but depends heavily on the start.
+        </td>
+        </tr>
+
+        <tr>
+        <td><strong>Simulated Annealing</strong></td>
+        <td>Usually take good moves, but sometimes accept bad moves.</td>
+        <td>
+            Can escape local minima. Balances exploration and exploitation.
+        </td>
+        <td>
+            Needs a temperature schedule. Can be slow or random if tuned badly.
+        </td>
+        <td>
+            When you need to escape traps but still want mostly greedy behavior.
+        </td>
+        </tr>
+
+        <tr>
+        <td><strong>Beam Search</strong></td>
+        <td>Keep the best <em>n</em> candidate solutions each round.</td>
+        <td>
+            Less risky than hill climbing. Searches multiple paths at once.
+        </td>
+        <td>
+            Uses more memory. Can still lose good paths if beam width is too small.
+        </td>
+        <td>
+            When one path is too risky, but full search is too expensive.
+        </td>
+        </tr>
+    </tbody>
+    </table>
+
     <hr>
 
     <h2>Conclusion</h2>

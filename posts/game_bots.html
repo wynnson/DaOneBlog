@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Bots</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Game Bots</h1>
+
+    <img class="image-center" src="../assets/images/game_bots/minimax_gif.gif" style="width: 65%; height: auto;">
+    <div class="source">Source: <a href="https://becominghuman.ai/algorithms-from-first-principles-minimax-1c57bd6640dc">Tejas</a></div>
+
+    <h2>Primer: Max Level NPC</h2>
+    <p>
+        Pikachu is playing Chess against his opponent. 
+        His opponent is a bot that is constantly destroying him.
+        Pikachu thinks to himself. How does it do it?
+        How does the opponent AI work?
+        How do we make our own to destroy their NPC?
+    </p>
+
+    <hr>
+
+    <h2>The Minimax Algorithm</h2>
+    <img class="image-center" src="../assets/images/game_bots/minmax.png" style="width: 65%; height: auto;">
+    <div class="source">Source: <a href="https://www.geeksforgeeks.org/dsa/minimax-algorithm-in-game-theory-set-1-introduction/">GeeksforGeeks</a></div>
+    <br>
+
+    <p>
+        One popular adversial AI algorithm is <strong>minimax</strong>.
+        It is basically an agent that maximizes its <strong>utility</strong> (payoff).
+        The algorithm looks like this:
+    </p>
+    <p>
+        $$
+        \begin{array}{c c}
+        \begin{aligned}
+        &\mathbf{define}\; max\_value(s): \\[4pt]
+        &\qquad \mathbf{if}\; \text{is-terminal}(s),\; \mathbf{return}\; utility(s) \\[4pt]
+        &\qquad v = -\infty \\[4pt]
+        &\qquad \mathbf{for}\; s'\;\text{in}\; successors(s): \\[4pt]
+        &\qquad\qquad v = \max(v, min\_value(s')) \\[4pt]
+        &\qquad \mathbf{return}\; v
+        \end{aligned}
+        &
+        \begin{aligned}
+        &\mathbf{define}\; min\_value(s): \\[4pt]
+        &\qquad \mathbf{if}\; \text{is-terminal}(s),\; \mathbf{return}\; utility(s) \\[4pt]
+        &\qquad v = \infty \\[4pt]
+        &\qquad \mathbf{for}\; s'\;\text{in}\; successors(s): \\[4pt]
+        &\qquad\qquad v = \min(v, max\_value(s')) \\[4pt]
+        &\qquad \mathbf{return}\; v
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        <h4>Complexity</h4>
+        <ul>
+            <li>Time: $O(b^m)$</li>
+            <li>Space: $O(bm)$</li>
+        </ul>
+        Same as DFS
+    </div>
+
+    <p>
+    Notice the image. Imagine it is your turn (root node).
+    You are always trying to get the maximum value. 
+    Of course, the corollary is that the opponent is trying to minimize you.
+    We are looking at the tree from your perspective.
+    The max function is what you run while the opponent is running the min function.
+    Notice they are the same thing.
+    From the opponent's perspective, they are running the max function.
+    </p>
+
+    <h4>Example</h4>
+
+    <img class="image-center" src="../assets/images/game_bots/mm_ex1.png">
+    <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+
+    <p>
+        Suppose you estimate (using some heuristic) the corresponding game states after some $\gamma$ rounds into the future 
+        Our job is to figure out what the actual state will be given some state space. In this case, we are red (root).
+    </p>
+
+    <ol>
+        <li>
+            Start from the bottom of the tree and work your way up. 
+            Since we want to maximize, we know what we should choose. We will obviously choose the max of each leaf.
+        </li>
+        
+        <img class="image-center" src="../assets/images/game_bots/mm_ex2.png"><br>
+
+        <li>
+            Now it is the opponent's turn. They want to minimize us (which maximizes them).
+            So They will choose the minimum from each branch.
+        </li>
+
+        <img class="image-center" src="../assets/images/game_bots/mm_ex3.png"><br>
+
+        <li>
+            Back to us. What do we do again? We want to maximize! So we'll chose 1 since 1 is the greatest.
+        </li>
+
+        <img class="image-center" src="../assets/images/game_bots/mm_ex4.png"><br>
+
+        <li>
+            So using some heursitic, we were able to "see into the future" and play out the game in advance.
+        </li>
+    </ol>
+
+    <hr>
+
+    <h2>Problems</h2>
+    <p>
+        If we simulate a bunch of scenarios, there are wayyyyyy too many scnearios to play out.
+        What can be done about this?
+    </p>
+
+    <h2>Symmetry</h2>
+    <p>
+        Some problems are already symmetrical. 
+        We should treat symmetrical cases as the same thing.
+        For example, in tic-tac-toe, starting in another of the corners is the same thing.
+        If we rotated our board, we would end up in effectively the same case. 
+        
+        <br><br>
+        <img class="image-center" src="../assets/images/game_bots/sym_tic_tac_toe.svg">
+        <div class="source">Source: <a href="https://twice22.github.io/">Victor BUSA</a></div><br>
+
+    </p>
+
+    <h2>$\alpha - \beta$ Pruning</h2>
+    Pruning has been used extensively in tree-like algorithms. 
+    If we know some bound, then we can prune the bad branches.
+    
+    <div class="important">
+        <ol>
+            <li>$\alpha$ = best utility MAX you can gaurantee</li>
+            <li>$\beta$ = best utility MIN you can guarantee</li>
+        </ol>
+        At a max node, $\alpha = \max(\alpha, v)$ then prune if $\alpha \ge \beta$<br>
+        At a min node, $\beta = \min(\beta, v)$ then prune if $\alpha \le \beta$ <br>
+        Where $v$ is the node value.
+    </div>
+
+    <p>
+        Here is minimax with $\alpha - \beta$ pruning:
+
+        $$
+        \begin{array}{c c}
+        \begin{aligned}
+        &\mathbf{define}\; max\_value(s, \alpha, \beta): \\[4pt]
+        &\qquad \mathbf{if}\; \text{is-terminal}(s),\; \mathbf{return}\; utility(s) \\[4pt]
+        &\qquad v = -\infty \\[4pt]
+        &\qquad \mathbf{for}\; s'\;\text{in}\; successors(s): \\[4pt]
+        &\qquad\qquad v = \max(v, min\_value(s', \alpha, \beta)) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; v \ge \beta,\; \mathbf{return}\; v \\[4pt]
+        &\qquad\qquad \alpha = \max(\alpha, v) \\[4pt]
+        &\qquad \mathbf{return}\; v
+        \end{aligned}
+        &
+        \begin{aligned}
+        &\mathbf{define}\; min\_value(s, \alpha, \beta): \\[4pt]
+        &\qquad \mathbf{if}\; \text{is-terminal}(s),\; \mathbf{return}\; utility(s) \\[4pt]
+        &\qquad v = \infty \\[4pt]
+        &\qquad \mathbf{for}\; s'\;\text{in}\; successors(s): \\[4pt]
+        &\qquad\qquad v = \min(v, max\_value(s', \alpha, \beta)) \\[4pt]
+        &\qquad\qquad \mathbf{if}\; v \le \alpha,\; \mathbf{return}\; v \\[4pt]
+        &\qquad\qquad \beta = \min(\beta, v) \\[4pt]
+        &\qquad \mathbf{return}\; v
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="note">
+        This allows the time complexity to become $O(b^{\frac{m}{2}})$ with perfect ordering.
+    </div>
+
+    <h2>Approximating Utility</h2>
+    <p>There are many ways to approximate utility:</p>
+    
+    <h4>1. Rollout (Simulation)</h4>
+    <p>
+        This basically simulates one path through the game tree.
+
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; rollout(s_0) \to \mathbb{R}: \\[4pt]
+        \qquad \begin{aligned}
+        &s = s_0 \\[4pt]
+        &\mathbf{if}\; s\;\text{is terminal}: \\[4pt]
+        &\qquad \mathbf{return}\; utility(s) \\[4pt]
+        &a = \text{random action for state } s \\[4pt]
+        &s = \text{simulate } a\;\text{from } s
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <div class="important">
+        <h4>Mutli-Armed Bandit</h4>
+        <p>
+            We can also choose which path to search since they all have different expected utility.
+            The mutli-armed bandit problem asks us which node to sample next.
+            The bandit chooses which moves to try, either exploiting (keep choosing nodes that look good) or exploring (choose new nodes).
+            Basically you're a gambler at a casino playing slot machines. 
+            There are lots of options. 
+            You want to try to find the highest payout slot machine to maximize profits (and dopamine).
+        </p>
+    </div>
+    
+    <h4>2. Experimental Mean Utility</h4>
+    <p>
+        Let $v_{j,1}, v_{j,2}, \dots, v_{j,p_j}$ be rewards from $n_j$ plays on machine $j$.
+        The experimental mean utility is:
+        $$
+        \bar{v_j} = \frac{\sum^{n_j}_{i=1} v_{j,i}}{n_j} 
+        $$
+        Exploitation: Spam what the machine we believe has the highest $\bar{v_j}$ <br>
+        Exploration: Try a machine with a low $n$
+    </p>
+
+    <h4>3. $\epsilon$ Greedy</h4>
+    <p>
+        Randomly pick a number. If the number is less than some $\epsilon$ value, we shall use a machine.
+        This part of exploration.
+        Otherwise, we exploit the best machine we know.
+
+        $$
+        \begin{array}{l}
+        \mathbf{define}\; \epsilon\_greedy(machines, \epsilon, n): \\[4pt]
+        \qquad \begin{aligned}
+        &\mathbf{for}\; i\;\text{in}\; [1, \ldots, n]: \\[4pt]
+        &\qquad \mathbf{if}\; \text{random}() < \epsilon: \\[4pt]
+        &\qquad\qquad machine = \text{random\_choice}(machines) \\[4pt]
+        &\qquad \mathbf{else}: \\[4pt]
+        &\qquad\qquad machine = \arg\max_{m \in machines}\; m.\text{mean\_utility}()
+        \end{aligned}
+        \end{array}
+        $$
+    </p>
+
+    <h4>4. Upper Confidence Bound 1 (UCB1)</h4>
+    <p>
+        The intuition is that if we haven't played a machine much, it might be very good.
+        We can assign some upper confidence to all our machines.
+
+        $$
+        \mathrm{UCB1}_j = \bar{v}_j + C\sqrt{\frac{\log(n)}{n_j}}
+        $$
+        Where:
+        <ul>
+            <li>$\bar{v_j}$ = average reward of arm so far (explot)</li>
+            <li>$C$ some scaler for exploration (higher = more exploration)</li>
+            <li>$\sqrt{\frac{\log(n)}{n_j}}$ = uncertainty bonus: <br>
+                1. bonus shrinks as we try more (increasing $n_j$) <br>
+                2. as we play more, we should also explore more ($log N$)
+            </li>
+        </ul>
+    </p>
+    
+    <br>
+    <h4>5. Monte Carlo Tree Search (MCTS)</h4>
+    <ol>
+        Repeat until time runs out for the turn:
+        <li><strong>Selection</strong>: Start from the root. Use UCB1 to pick promising children or underexplored ones</li>
+        <li><strong>Expansion</strong>: Take a leaf node and generate the next legal states, adding them to a tree to explore. We will then pick a random child $C$ </li>
+        <li><strong>Simulation</strong> (Rollout): Simulate game from $C$ to terminal state (using any value estimation method)</li>
+        <li><strong>Backpropagation</strong>: Update $t$ and $n$ up the tree</li>
+    </ol>
+
+    <hr>
+
+    <h2>Expectimax</h2>
+    <p>
+        But what if the games are played by chance?
+        For example when the opponent bot moves, it might first sample some distribution then make a move.
+        Maybe sometimes the other bot miscalculates their heuristic, hallucinates, then blunders. 
+        For things with chance, we need to account for the <strong>expected value</strong>. 
+        We can do this with <strong>expectimax</strong> which is just the expected value version of mini max.
+    </p>
+
+    <p>
+        Recall that expected value (we'll refer to this as the expected utility):
+        
+        $$
+        E[X] = \sum P(X = x) x
+        $$
+
+        Now we just need to calculate the expected value per each "chance" node to see what we will take.
+        Previously we just took the min / max of our branches but we need to add an extra phantom chance node for the expected value.
+    </p>
+    
+    <h4>Example</h4>
+
+    <img class="image-center" src="../assets/images/game_bots/em_ex1.png" style="width: 65%; height: auto;">
+    <div class="source">Source: CS 3600 (Georgia Tech)</div><br>
+    
+    <ol>
+        <li>
+            Again, start from the bottom of the tree and work your way up. 
+            The green represents the chance nodes which are the phantom nodes that provide us with the expected value of going down this branch.
+            We can start by calculating those.
+            For example for the 1st one from the left:
+
+            $$
+            -11 \cdot \frac{1}{13} + 1 \cdot \frac{12}{13} = \frac{1}{13}
+            $$
+        </li>
+        
+        <img class="image-center" src="../assets/images/game_bots/em_ex2.png" style="width: 65%; height: auto;"><br>
+
+        <li>
+            Now we just choose the maximum expected value from each of the chance nodes, representing the potential of each branch. 
+            We repeat this up the tree.
+        </li>
+
+        <img class="image-center" src="../assets/images/game_bots/em_ex3.png" style="width: 65%; height: auto;"><br>
+
+        <li>We choose the right branch because it is the most utility maximizing.</li>
+    </ol>
+
+    <div class="note">
+        <h4>Expectiminimax</h4>
+        <p>
+            Expectiminimax is a hydrid of Expectimax + Minimax except we alternate between choosing the min and max (instead of just the max).
+            Basically run the minimax but add the chance nodes in since these games are stocastic (by chance).
+            It looks something like this:
+        </p>
+
+        <img class="image-center" src="../assets/images/game_bots/expectimm.png" style="width: 65%; height: auto;"><br>
+
+    </div>
+
+    <hr>
+
+    <h2>AlphaGo</h2>
+    <img class="image-center" src="../assets/images/game_bots/alphago.gif">
+    <div class="source">Source: <a href="https://deepmind.google/research/alphago/">Google DeepMind</a></div><br>
+    
+    <p>
+        While not a chess bot, AlphaGo (made by Google's DeppMind) is a similar bot for the game, Go. 
+        Go has a much larger board and thus a lot more possibilities (more states - about $10^100$), making search nearly impossible.
+        Sadly it destroys the top Go players.
+        Here is how it works (exntension of everything I talked about above):
+    </p>
+    <p>
+        Going back to monte carlo tree search (MCTS), we replace some of the steps with NN.
+        <ul>
+            <li>Value head: NN outputs $P(win | state)$ -> replaces simulation (rollout) step</li>
+            <li>Policy head: NN outputs $P(action | state)$ -> guides selection step with a modified UCB1</li>
+        </ul>
+        <div class="note">
+            <h4>Note</h4>
+            <p>Alpha Go was trained entirely through self-play (we are cooked).</p>
+        </div>
+    </p>
+
+     <img class="image-center" src="../assets/images/game_bots/pikamcts.jpg" style="width: 90%; height: auto;">
+    <div class="source">Source: Me :)</div><br>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
