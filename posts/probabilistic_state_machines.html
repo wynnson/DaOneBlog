@@ -431,7 +431,7 @@
     &\quad r + \gamma \max_{a' \in A(s')} Q(s', a') \\
     &\text{objective fn: } \min \left(
       r + \gamma \max_{a' \in A(s')} Q(s', a') - \hat{Q}(s,a)
-    \right)
+    \right)^2
     \end{aligned}
     $$
     
@@ -443,7 +443,7 @@
         $$
         \min \left(
         r + \gamma \max_{a' \in A(s')} Q(s', a') - \hat{Q}(s,a)
-        \right)
+        \right)^2
         $$
         
         Actual reward from the state & action - predicted reward from state & action.
