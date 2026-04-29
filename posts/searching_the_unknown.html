@@ -441,7 +441,7 @@
             $$ 
             This means that for a heuristic to be consistent, for some node $N$, the priority must be less 
             than the cost from $N$ to another node $P$ + heuristic for $P$.
-            In other words, our heuristic estimate should not suddenly improve more than the cost of that step.
+            In other words, our heuristic estimate minus the heuristic from the next state should not be greater than the real cost to get there.
         </p>
         <p>
             There are <u>2 types of heuristics</u> for searching: 
