@@ -146,11 +146,11 @@
     
     <div class="important">
         <ol>
-            <li>$\alpha$ = best utility MAX you can gaurantee</li>
-            <li>$\beta$ = best utility MIN you can guarantee</li>
+            <li>$\alpha$ = best utility MAX you can gaurantee, starts @ $-\infty$</li>
+            <li>$\beta$ = best utility MIN you can guarantee, starts @ $+\infty$</li>
         </ol>
         At a max node, $\alpha = \max(\alpha, v)$ then prune if $\alpha \ge \beta$<br>
-        At a min node, $\beta = \min(\beta, v)$ then prune if $\alpha \le \beta$ <br>
+        At a min node, $\beta = \min(\beta, v)$ then prune if $\alpha \ge \beta$ <br>
         Where $v$ is the node value.
     </div>
 
