@@ -188,6 +188,10 @@
         This allows the time complexity to become $O(b^{\frac{m}{2}})$ with perfect ordering.
     </div>
 
+    <p>Here is an example I worked out:</p>
+    <img class="image-center" src="../assets/images/game_bots/ab-example.jpg">
+    <div class="source">Source: <a href="https://people.cs.pitt.edu/~litman/courses/cs2710/lectures/pruningReview.pdf">University of Pittsburg CS</a></div>
+
     <h2>Approximating Utility</h2>
     <p>There are many ways to approximate utility:</p>
     
@@ -359,8 +363,8 @@
     <p>
         Going back to monte carlo tree search (MCTS), we replace some of the steps with NN.
         <ul>
-            <li>Value head: NN outputs $P(win | state)$ -> replaces simulation (rollout) step</li>
-            <li>Policy head: NN outputs $P(action | state)$ -> guides selection step with a modified UCB1</li>
+            <li>Value head $V(s)$: NN outputs $P(win | state)$ -> replaces simulation (rollout) step</li>
+            <li>Policy head $\pi(a | s)$: NN outputs $P(action | state)$ -> guides selection step with a modified UCB1</li>
         </ul>
         <div class="note">
             <h4>Note</h4>
