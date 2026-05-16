@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Largest Rectangle in Histogram</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Largest Rectangle in Histogram</h1><br><br>
+    
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/histogram1.png">
+    <div class="source">Source: <a href="https://www.geeksforgeeks.org/dsa/largest-rectangular-area-in-a-histogram-using-segment-tree/">GeeksforGeeks</a></div>
+    
+    <h2>Primer: Largest Rectangle in Histogram</h2>
+    <p> 
+        The problem reads as follows: 
+        Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.
+    </p>
+    <div class="note">
+        This is also <a href="https://leetcode.com/problems/largest-rectangle-in-histogram/description/">Leetcode 84</a>.
+        I will refer to the individual rectangles as <strong>bars</strong>.
+    </div>
+
+    <p>Before I show you a solution, try to solve it yourself!</p>
+
+    <hr>
+
+    <h2>Example Set</h2>
+    <p>We will be using this classical example:</p><br>
+
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/histogram-ex.jpg">
+    <div class="source">Source: <a href="https://leetcode.com/problems/largest-rectangle-in-histogram/description/">Leetcode 84</a></div>
+    <br>
+    <p>Input: heights = [2,1,5,6,2,3]</p>
+    <p>Output: 10</p>    
+    
+    <hr>
+
+    <h2><u>Solutions</u></h2>
+    <div class="important">
+        All solutions / code should be wrapped in a class.
+    </div>
+
+    <h2>Brute-Force</h2>
+    <p>
+        We will start with the most obvious approach.
+        The intuition is that we enumerate over all bars with 2 pointers.
+        We will need to keep a lowerbound height as we loop through since we are constrained by it.
+    </p>
+    <br>
+    <p>Here is an example on iteration i = 0:</p>
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/hist-brute-f.png" style="width: 55%; height: auto;">
+    
+    <p>
+        The idea is that for each bar, we expand our bounds to see the maximum area rectangle we can make.
+        In code this looks like:
+    </p>
+    <pre>
+        <code class="language-python">
+            def largestRectangleArea(self, heights: List[int]) -> int:
+                n = len(heights)
+                max_area = 0
+
+                for i in range(n):
+                    lower_bound = math.inf
+                    for j in range(i, n):
+                        lower_bound = min(lower_bound, heights[j])
+                        rectangle = lower_bound * (j - i + 1)
+                        max_area = max(max_area, rectangle)
+                
+                return max_area
+        </code>
+    </pre>
+    <div class="note">
+        <h4>Note on +1</h4>
+        <p>
+            We need the +1 for inclusivity. For example, in the case that i = 0, j = 0, doing j - i = 0 - 0 = 0.
+            The +1 is there to say that the bar actually has a width of 1.
+            Another way to think about it is the +1 shifts the j pointer outside the bar (exclusive) so that when you subtract j - i, 
+            the difference is the width of the rectangle.
+        </p>
+    </div>
+
+    <p>
+        The time complexity will be $O(n^2)$ from the enumeration of the bars (i, j).
+        This will be a bottleneck on large input sizes.
+        Since we didn't allocate extra space, the space complexity is constant, $O(1)$.
+    </p>
+
+    <h2>Div. & Conq.</h2>
+    <p>
+        A powerful idea is that the problem is comprised of <u>subproblems</u>. 
+        This is known as <strong>Divide and Conquer</strong>.
+        We can break our max area down into 3 subproblems:
+        <ol>
+            <li>The max area is the maximal width times the shortest bar</li>
+            <li>The max area is confined by the left bar</li>
+            <li>The max area is confined by the right bar</li>
+        </ol>
+    </p>
+    
+    <br>
+    <p>Here is a visual provided by the LeetCode editorial:</p>
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/84_Largest_Rectangle2.png">
+    <div class="source">Source: <a href="https://leetcode.com/problems/largest-rectangle-in-histogram/description/">Leetcode 84 Editorial</a></div>
+    
+    <br>
+    <p>
+        The core idea [<strong>divide step</strong>] is that we can keep splitting based on the minimum. 
+        Then when we recurse back [<strong>conquer step</strong>], we can return the maximum of the 3 cases:
+
+        $$
+            \max(
+                \text{left split area}, \ \  \text{right split area}, \ \ \text{min height $\times$ width}
+            )
+        $$
+        
+        This way, our final returned solution contains the max area of the entire histogram.
+    </p>
+
+    <p>
+        <pre>
+            <code class="language-python">
+                def recurse(self, heights: List[int], i: int, j: int) -> int:
+                    # base case
+                    if i > j:
+                        return 0
+
+                    # get min idx (argmin)
+                    min_idx = i
+                    for k in range(i, j + 1):
+                        if heights[k] < heights[min_idx]:
+                            min_idx = k
+
+                    # divide (split)
+                    left = self.recurse(heights, i, min_idx - 1)
+                    right = self.recurse(heights, min_idx + 1, j)
+
+                    # conquer
+                    return max(
+                        heights[min_idx] * (j - i + 1),
+                        left,
+                        right
+                    )
+
+                def largestRectangleArea(self, heights: List[int]) -> int:
+                    return self.recurse(heights, 0, len(heights) - 1)
+            </code>
+        </pre>
+    </p>
+
+    <p>
+        The time complexity on average is $O(nlogn)$ from the splitting.
+        Worse case is $O(n^2)$ if the heights array was already sorted (meaning finding the min doesn't matter).
+        Space complexity is $O(n)$ because of the recursion.
+    </p>
+
+    <div class="important">
+        <h4>Masters Thereom (Div & Conq)</h4>
+        <p>
+            The masters theorem gives the runtime of divide and conquer algorithms.
+            This is given by: 
+            $$
+                T(n) = a \cdot T(\frac{n}{b}) + f(n)
+            $$
+            where $a \ge 1, b > 1$, $f(n) = d$.
+        </p>
+        <ul>
+            <li>$a$ represents # of subproblems</li>
+            <li>$b$ represents how much the subproblem shrinks (division factor)</li>
+            <li>$f(n)$ represents any extra "work." This is represented by $d$.</li>
+        </ul>
+        <p>
+            In this case, we split into left and right so $a = 2$.
+            $b = 2$ because left and right divides our subproblem space in half.
+            $f(n) = n$ because finding the argmin (min idx) is a linear scan.
+
+            $$
+            T(n) = 2 \cdot T \left( \frac{n}{2} \right) + O(n)
+            $$
+
+            The runtime is given by the following cases:
+
+            $$
+            T(n) = aT\left(\frac{n}{b}\right) + d
+            $$
+
+            $$
+            T(n) \in
+            \begin{cases}
+            \Theta(n^d), & a < b^d \\
+            \Theta(n^d \log n), & a = b^d \\
+            \Theta(n^{\log_b a}), & a > b^d
+            \end{cases}
+            $$
+        
+        We have the case: $a = b^d$ since $2 = 2^1$. 
+        $d = 1$ meaning linear work ($d = 0$ is constant) done.
+        Thus, the runtime is:
+
+        $$
+        O(n^1 log n) = O(nlogn)
+        $$
+        </p>
+    </div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+
+      hljs.highlightAll();
+    });
+  </script>
+</body>
+</html>

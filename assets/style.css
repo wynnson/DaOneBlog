@@ -65,10 +65,16 @@ pre {
   padding: 1rem;
   overflow-x: auto;
   margin-bottom: 1rem;
+  border-radius: 10px;
 }
 
 pre code {
   background: none;
+  padding: 0;
+}
+
+pre code.hljs {
+  background: transparent;
   padding: 0;
 }
 
@@ -158,6 +164,11 @@ img {
 
 .toc-title {
   font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.toc-title-big {
+  font-size: 1.4rem;
   margin-bottom: 0.25rem;
 }
 
