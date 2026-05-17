@@ -65,22 +65,19 @@
         The idea is that for each bar, we expand our bounds to see the maximum area rectangle we can make.
         In code this looks like:
     </p>
-    <pre>
-        <code class="language-python">
-            def largestRectangleArea(self, heights: List[int]) -> int:
-                n = len(heights)
-                max_area = 0
+    <pre><code class="language-python">def largestRectangleArea(self, heights: List[int]) -> int:
+    n = len(heights)
+    max_area = 0
 
-                for i in range(n):
-                    lower_bound = math.inf
-                    for j in range(i, n):
-                        lower_bound = min(lower_bound, heights[j])
-                        rectangle = lower_bound * (j - i + 1)
-                        max_area = max(max_area, rectangle)
-                
-                return max_area
-        </code>
-    </pre>
+    for i in range(n):
+        lower_bound = math.inf
+        for j in range(i, n):
+            lower_bound = min(lower_bound, heights[j])
+            rectangle = lower_bound * (j - i + 1)
+            max_area = max(max_area, rectangle)
+
+    return max_area
+</code></pre>
     <div class="note">
         <h4>Note on +1</h4>
         <p>
@@ -160,7 +157,7 @@
     </p>
 
     <p>
-        The time complexity on average is $O(nlogn)$ from the splitting.
+        The time complexity on average is $O(nlogn)$ from the splitting, where $n$ is the length of the heights array.
         Worse case is $O(n^2)$ if the heights array was already sorted (meaning finding the min doesn't matter).
         Space complexity is $O(n)$ because of the recursion.
     </p>
@@ -214,6 +211,151 @@
         </p>
     </div>
 
+    <h2>Monotonic Stack</h2>
+    <p>
+        A <strong>monotonic stack</strong> is simply a stack with either increasing or decreasing ordering.
+        In other words, the stack is ordered / sorted (can be strictly increasing / decreasing as well).
+        To maintain ordering, we use a monotonically increasing stack that is not strictly increasing.
+        This ordering is known as an <strong>invariant</strong> meaning rule or constant.
+        The monotonic stack method is a standard way to solve problems relating to:
+        <ul>
+            <li>next greater</li>
+            <li>previous greater</li>
+            <li>next smallest</li>
+            <li>previous smallest</li>
+            <li>span / range</li>
+        </ul>
+    </p>
+
+    <div class="note">
+        <a href="https://www.youtube.com/watch?v=Dq_ObZwTY_Q">Here</a> is an awesome video by AlgoMonster on monotonic stacks.
+    </div>
+
+    <h3>Example</h3>
+    <p>
+        Suppose we have: $s$ = [1, 3, 5] <br>
+        Next, we push 2 onto the stack making: $s$ = [1, 3, 5, 2]. <br>
+        This is no longer monotonic so we must continuously pop to fix the ordering: <br>
+        $s$ = [1, 3, 2], popping 5 <br>
+        $s$ = [1, 2], popping 3
+    </p>
+
+    <h3>Visual Example</h3>
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/monostack.svg">
+    <div class="source">Source: <a href="https://www.designgurus.io/course-play/grokking-the-coding-interview/doc/introduction-to-monotonic-stack">Design Gurus</a></div><br>
+
+    <h3>Rectangles and Monotonic Stack</h3>
+    <p>
+        Here is the core idea: the largest rectangle exists in the increasing sections.
+        That means we can use an increasing monotonic stack.
+        To make this make a little more sense, look at the second 2.
+        Upon discovering 2, we introduced another lowerbound (where the first element (1) of the monotonic stack was the previous lowest bound).
+        Thus, we should test the candidate rectangle (in red) for a max and remove parts of it to maintain our invariant.
+    </p>
+
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/monostackex1.png" style="width: 35%; height: auto;">
+    
+    <p>
+        At the second 2, $s$ = [1, 5, 6, 2] meaning we have to pop since we introduced a concavity.
+        After popping we remain with $s$ = [1, 2] and the algorithm continues, leaving us with the blue section.
+        But notice, at the end, we still have $s$ = [1, 2, 3]. 
+        We never check the blue rectangle since the invariant is maintained.
+        To get around this we can do 2 things: post-processing or a nifty trick :)
+        We can just pad the end with a 0 to force concavity, clearing our stack!
+    </p>
+
+    <h3>Post Processing Code (If Interested)</h3>
+    <pre>
+        <code class="language-python">
+            while stack:
+                current_height = heights[stack.pop()]
+                current_width = len(heights) - stack[-1] - 1
+                max_area = max(max_area, current_height * current_width)
+        </code>
+    </pre>
+    
+    <div class="note">
+        <h4>Note</h4>
+        <p>We will use the 0 trick to force the invariant.</p>
+    </div>
+
+    <h3>Overview</h3>
+    <p>
+        To tie it all together, here is the entire idea:
+        <ol>
+            <li>Loop through the bars</li>
+            <li>While current height is less than the top of the stack, pop and calculate max height</li>
+            <li>Otherwise, append to stack (we will just append the idx)</li>
+            <li>Return max height</li>
+        </ol>
+    </p>
+
+    <div class="important">
+        <h4>Popping Mechanic</h4>
+        <p>
+            Before I implement it, we should understand the popping mechanic in a little more depth.
+            When I say we pop from the stack, that means we are popping from the largest bar (stack top).
+            In other words we are calculating the rectangle from right to left.
+            To properly find the width, we will use the last valid left neighbor$^*$ (maintaining the invariant)
+            for a left bound and the current index position (where we start popping bc of invariant) as the right bound.
+            This means we will have to subtract 1 as both ranges are exclusive and subtracting 1 will make right bound inclusive (we can also add 1 to left bound).
+            This way, we can calculate the width properly.
+            So our update for max area looks like this (note we could have used idx - 1 - left):
+
+            $$\max(heights[top] * (idx - (left + 1)), max \ area)$$
+        </p>
+        <h4>Edge Case</h4>
+        <p>
+            $^*$ Suppose we have $heights$ = [0, 3, 2, 5, 0], $s$ = [0, 2, 5], and our current iteration points to the second 0,
+            meaning we have to clear our stack.
+            The important thing to note is that when popping 2, we use the left bound as 0 (the last valid left neighbor).
+            We can't just use 2's neighbor (3) or else we would be missing a bar when we do +1 or -1.
+            
+            <br><br>
+            <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/monostackedge.png" style="width: 35%; height: auto;">
+
+        </p>
+    </div>
+
+    <p>
+        This shows the popping mechanic when we reach the second 2. 
+        Note how we check the rectangles R to L.
+    </p>
+    <img class="image-center" src="../assets/images/largest_rectangle_in_histogram/monostackex2.png" style="width: 35%; height: auto;">
+
+    <pre>
+        <code class="language-python">
+            def largestRectangleArea(self, heights: List[int]) -> int:
+                if len(heights) == 0:
+                    return 0
+
+                heights.append(0)
+                stack = []
+                max_height = 0
+                
+                for idx, num in enumerate(heights):
+                    while stack and num < heights[stack[-1]]:
+                        top = stack.pop()
+                        left = stack[-1] if stack else -1
+                        max_height = max(
+                            heights[top] * (idx - (left + 1)),
+                            max_height
+                        )
+                    stack.append(idx)
+                
+                return max_height
+        </code>
+    </pre>
+
+    <br>
+    <p>
+        This runs in $O(n)$ since we only do one pass.
+        It uses $O(n)$ space for the stack.
+        Thus this is the most effective solution.
+    </p>    
+
+    <h2>Conclusion</h2>
+    <p>Now you know how to find the largest rectangle in a histogram ... not that anyone asked.</p>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
