@@ -347,7 +347,63 @@
         </code>
     </pre>
 
-    <br>
+    <div class="note">
+        In this case I used <code>left = stack[-1] if stack else -1</code>. 
+        This is equivalent of putting a placeholder bar before everything so our width calculation works.
+        There are also other ways to do this.
+
+        <details class="code-dropdown">
+            <summary>[Show] stack = [-1] version</summary>
+            <pre><code class="language-python">
+                def largestRectangleArea(self, heights: List[int]) -> int:
+                    if len(heights) == 0:
+                        return 0
+
+                    heights.append(0)
+                    stack = [-1]
+                    max_height = 0
+                    
+                    for idx, num in enumerate(heights):
+                        while stack[-1] != -1 and num < heights[stack[-1]]:
+                            top = stack.pop()
+                            left = stack[-1]
+                            max_height = max(
+                                heights[top] * (idx - (left + 1)),
+                                max_height
+                            )
+                        stack.append(idx)
+                    
+                    return max_height
+            </code></pre>
+        </details>
+
+        <details class="code-dropdown">
+            <summary>[Show] [0] prepend version</summary>
+            <pre><code class="language-python">
+                def largestRectangleArea(self, heights: List[int]) -> int:
+                    if len(heights) == 0:
+                        return 0
+
+                    heights = [0] + heights + [0]
+                    stack = []
+                    max_height = 0
+                    
+                    for idx, num in enumerate(heights):
+                        while stack and num < heights[stack[-1]]:
+                            top = stack.pop()
+                            left = stack[-1]
+                            max_height = max(
+                                heights[top] * (idx - (left + 1)),
+                                max_height
+                            )
+                        stack.append(idx)
+                    
+                    return max_height
+            </code></pre>
+        </details>
+    </div>
+
+
     <p>
         This runs in $O(n)$ since we only do one pass.
         It uses $O(n)$ space for the stack.

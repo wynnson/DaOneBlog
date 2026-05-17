@@ -130,6 +130,16 @@ a.back:hover {
   border-radius: 4px;
 }
 
+.code-dropdown {
+  margin-top: 0.75rem;
+}
+
+.code-dropdown summary {
+  cursor: pointer;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
 img {
   max-width: 100%;
   height: auto;
