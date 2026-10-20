@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attention and Transformers</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="../index.html" class="back">← Home</a><br><br>
+    <h1>Attention and Transformers</h1>
+    
+    <h2>Primer: ATTENTION!</h2>
+    <p>
+        This brief post will speedrun attention and transformers.
+        This idea transformed the world.
+        I'll go fast because the world is now running out of attention.
+    </p>
+
+    <div class="important">
+        <h4>Def: Token</h4>
+        <p>
+            Unit of input information that is represented as a vector for a machine.
+            In LLMs, this would can be a word, half a word, a chunk of words (depending on the LLM).
+            Just know that this is a "unit" of info that models process on.
+        </p>
+    </div>
+
+    <h2>WTF is (Self) Attention?</h2>
+    <p>
+        Lets walk through the pipeline of what a LLM sees after you prompt it.
+        Here, I will show the <strong>self-attention</strong> layer.
+        First, your prompt is broken up into <strong>tokens</strong>. 
+        The tokens are then transformed to numbers that the model understands.
+        We call this an <strong>embedding</strong>, $X$.
+    </p>
+    <img class="image-center" src="../assets/images/attention_and_transformers/prompt_step1.png">
+    <p>
+        The embedding $X$, creates 3 matricies $Q, K, V$. We will learn the weights (in training):
+        $$
+        Q = W_QX \\
+        K = W_KX \\
+        W = W_WX
+        $$
+    </p>
+    <p>Let's understand $QKV$ like we are buying a house.</p>
+    <img class="image-center" src="../assets/images/attention_and_transformers/qkv_house.png">
+    <p>$Q$ is the buyer. Buyer want house.</p>
+    <p>$K$ is real estate agent. Agent want to advertise house using its features.</p>
+    <p>$V$ is the house. House have content (stuff inside).</p>
+
+    <p>
+        We seperate the roles because this way, the each role learns specific things so the job is done better.
+        During training, train the weights $W_Q, W_K, W_W$ so each person gets better at their role.
+    </p>
+
+    <p>
+        Now, $Q$ wants to shop for houses. 
+        The houses that interest $Q$ are the ones with similar features to what $Q$ is looking for in $K's$ advertisement.
+        We can compute a similarity function to the houses we had in mind:
+
+        $$
+        E = \frac{QK^T}{\sqrt{d}}
+        $$
+
+        Visually:
+        <img class="image-center" src="../assets/images/attention_and_transformers/similarity.png">
+        Notice that this type of matrix multiplication can be done very fast with GPUs.
+    </p>
+    
+    <div class="note">
+        <h4>Why $\sqrt{d}$?</h4>
+        <p>
+            We divide by $\sqrt{d}$ to normalize, helping us avoid exploding and vanishing gradients. 
+            $\sqrt{d}$ is our standard deviation.
+            The assumption is $q_i$ and $k_i$ have $\mu=0$, $var=\sigma^2=1$
+        </p>
+        <p>
+            $$
+            \begin{aligned}
+            Q\cdot K &= \sum_{i=1}^{d_k}q_i k_i\\
+            E[q_i]&=E[k_i]=0,\quad \operatorname{Var}(q_i)=\operatorname{Var}(k_i)=1\\
+            \operatorname{Var}(q_i k_i)&=E[q_i^2]E[k_i^2]=1\\
+            \operatorname{Var}(Q\cdot K)=\sigma^2&=\sum_{i=1}^{d_k}1=d_k\\
+            \sigma&=\sqrt{d_k}
+            \end{aligned}
+            $$
+        </p>
+    </div>
+
+    <p>
+        $E$ represents the similarity scores between the house we have in mind and the agent's recommendation.
+        However, We want this to be a probability to make sense of raw numbers. We can use softmax.
+        Each house then occupies some fraction of our total attention (A):
+        $$
+        A = softmax(E)
+        $$
+        Visually:
+        <img class="image-center" src="../assets/images/attention_and_transformers/attention_scores.png">
+    </p>
+
+    <p>
+        Now we know how much attention we should pay to each house! We need to visit the houses ($V$) now.
+        Let $Y$ denote the output of model. For us, $Y = $ total value ($$$) of houses we chose to see.
+    </p>
+    
+    <p>
+        To do this, we can just take a weighted sum between our attention scores and $V$:
+        $$Y = \sum_j A_{i,j} V_j$$
+        This is the weighted sum of how much attention we spent at each house and the value of the house, providing us
+        with the total value $Y$.
+        <img class="image-center" src="../assets/images/attention_and_transformers/weighted_sum.png">
+    </p>
+
+    <p>
+        Annnnnnddddddd....... that's actually all of self attention. We went from input $X$ to output $Y$.
+        Now let's zoom out and look at the pipeline we went through:
+        <img class="image-center" src="../assets/images/attention_and_transformers/self_attn.png">
+    </p>
+
+    <h2>Positional Encodings</h2>
+    <p>
+        Notice there is a <strong>PE</strong> box. PE stands for <strong>Positional Encoding</strong>.
+        Originally transformers were designed for sequences (successor of RNN, LSTMs).
+        In our pipeline, we never tracked sequences. 
+        We can run our input through a PE function and add it to keep track of sequences.
+        Here are 2 popular options:
+    </p>
+
+    <h4>Linear Positional Encoding</h4>
+    <p>
+        $$
+        PE(pos) = a \cdot pos + b
+        $$
+    </p>
+    <h4>Sin / Cos Positional Encoding</h4>
+    <p>$$
+        \begin{aligned}
+        PE_{(pos,2i)} &= \sin\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)\\
+        PE_{(pos,2i+1)} &= \cos\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)
+        \end{aligned}
+        $$
+    </p>
+
+    <h2>Multi-Headed Self Attention (MHA)</h2>
+    <p>
+        Now, if we duplicate the self-attention layers, we get <strong>multi-headed Self Attention</strong> (MHA).
+        By duplicating self attention, we each head can attend to different parts of the input (hopefully).
+        <img class="image-center" src="../assets/images/attention_and_transformers/mha.png">
+    </p>
+
+    <h2>Transformer Block</h2>
+    <p>
+        Let's use the MHA layer to create a transformer block:
+        <img class="image-center" src="../assets/images/attention_and_transformers/transformer_block.png">
+        This adds additional infra (residuals, MLP, layer norm) to form a transformer block.
+        We can stack these block units to form a transformer.
+    </p>
+
+    <h2>The Transformer</h2>
+    <img class="image-center" src="../assets/images/attention_and_transformers/transformer.png">
+    <div class="source">Source: <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></div>
+    <br>
+    <p>
+        This specific architecture consists of an encoder (left) and decoder (right).
+        The encoder produces representations of one modality and decoder uses encoder outputs to predict
+        what comes next. However, to train the decoder, we can't have tokens looking at all the other tokens.
+        We need a ..... MASK!
+    </p>
+
+    <h2>Masked Self Attention</h2>
+    <img class="image-center" src="../assets/images/attention_and_transformers/masked_self_attn.png">
+    <div class="source">Source: Deep Learning, Georgia Tech, Danfei Xu</a></div>
+    <br>
+    <p>
+        We mask using $-\infty$ This way, the softmax of $-\infty$ pushes the attention of $E$ at $i,j$ to 0.
+        For the decoder, we shift the inputs to the right, using <code>&lt;SOS&gt;</code> token and <code>&lt;EOS&gt;</code>.
+        Thus, during training, the decoder sees:
+        <br><br>
+
+        <code>&lt;SOS&gt;</code> & encoder ouput -> predicts next token.
+        It then repeats this until it sees <code>&lt;EOS&gt;</code>.
+    </p>
+
+    <h2>Conclusion</h2>
+    <p>
+        Ok so what did we just do. We went through the self attention layer then multi-headed attention.
+        Then a transformer block. Then a transformer. OK bye.
+        <img class="image-center" src="../assets/images/attention_and_transformers/pika_attn.png">
+    </p>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
