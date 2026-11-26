@@ -4,25 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Da One Blog</title>
-  <link rel="stylesheet" href="./assets/style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/style.css">
 </head>
-<body>
-  <header class="site-header">
-    <div class="site-title">Da One Blog</div>
-    <div class="site-subtitle">&gt;&gt; written by Wynnson Zheng</div>
-  </header>
+<body class="home">
+  <div class="scene">
+   <div class="crt">
+    <div class="crt-back"></div>
+    <div class="crt-bezel">
+     <div class="crt-recess">
+      <main class="crt-screen">
+        <div class="crt-content">
+          <div class="term-line dim" data-boot>LILO boot: linux</div>
+          <div class="term-line dim" data-boot>Linux version 1.0.9 (root@wynnson)</div>
+          <div class="term-line" data-boot data-pause>wynnson login: guest</div>
 
-  <h1 class="toc-title-big">
-    Table of Contents <span class="toc-note"><small>(Read In No Particular Order)</small></span>
-  </h1>
-  
-  <!-- Posts -->
+          <header class="site-header" data-boot data-pause>
+            <div class="site-title term-title">Da One Blog</div>
+            <div class="site-subtitle term-sub">&gt;&gt; written by Wynnson Zheng</div>
+          </header>
+
+          <div class="term-line" data-boot><span class="prompt"><span class="p-user">guest@wynnson</span>:<span class="p-path">~</span>$</span> ls</div>
+          <ul class="toc-list dir-list">
+            <li><a href="#posts">posts/</a><span class="date">Theory Crafting</span></li>
+            <li><a href="personal/index.html">personal/</a><span class="date">Life Stuff</span></li>
+          </ul>
+
+          <div class="term-line" id="posts" data-boot><span class="prompt"><span class="p-user">guest@wynnson</span>:<span class="p-path">~</span>$</span> ls posts/</div>
+          <h1 class="toc-title-big" data-boot>
+            Table of Contents <span class="toc-note"><small>(Read In No Particular Order)</small></span>
+          </h1>
+
+          <!-- Posts -->
   <ol type="I" class="toc-list">
     <li><a href="posts/dummies_guide_to_linear_regression.html">Dummies Guide to Linear Regression (for ML)</a><span class="date">2026.04.03 & 04</span></li>
     <li><a href="posts/regularized_regression_controlling_overfitting.html">Regularized Regression: Controlling Overfitting</a><span class="date">2026.04.05 </span></li>
@@ -44,17 +58,29 @@
     <li><a href="posts/attention_and_transformers.html">Attention and Transformers</a><span class="date">2026.10.19 & 20</span></li>
   </ol>
 
+          <div class="term-line" data-boot><span class="prompt"><span class="p-user">guest@wynnson</span>:<span class="p-path">~</span>$</span> <span class="cursor"></span></div>
+        </div>
+        <div class="crt-standby" aria-hidden="true">
+          <span><span class="click">CLICK ANYWHERE</span><span class="tap">TAP ANYWHERE</span></span>
+          <small>to start</small>
+        </div>
+      </main>
+     </div>
+      <div class="crt-label">DA-ONE 8000</div>
+      <div class="crt-vents"></div>
+      <div class="crt-led"></div>
+      <button class="crt-power" type="button" aria-label="Power"></button>
+      <aside class="sticky-note" aria-label="Keyboard tip">
+        <b>TIP:</b>
+        <p><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to navigate</p>
+        <p><kbd>ENTER</kbd> to open</p>
+      </aside>
+    </div>
+    <div class="crt-stand"></div>
+    <div class="crt-base"></div>
+   </div>
+  </div>
 
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      renderMathInElement(document.body, {
-        delimiters: [
-          {left: "$$", right: "$$", display: true},
-          {left: "$", right: "$", display: false}
-        ]
-      });
-    });
-  </script>
+  <script src="./assets/terminal.js"></script>
 </body>
 </html>

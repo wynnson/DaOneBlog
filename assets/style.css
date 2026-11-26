@@ -1,3 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Caveat:wght@600&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* =========================================================
+   Da One Blog — retro 8-bit terminal theme
+   ========================================================= */
+
+:root {
+  --bg: #0a0f0a;
+  --bg-panel: #0f1a10;
+  --fg: #6ee39b;
+  --fg-bright: #c6f2d3;
+  --fg-dim: #47a06a;
+  --fg-faint: #22513a;
+  --amber: #e3ad55;
+  --cyan: #74d3dc;
+  --glow: 0 0 2px rgba(110, 227, 155, 0.35), 0 0 7px rgba(110, 227, 155, 0.12);
+  --pixel: 'VT323', monospace; /* display text: same terminal font, just bigger */
+  --term: 'VT323', 'JetBrains Mono', monospace;
+  --code: 'JetBrains Mono', monospace;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,84 +30,171 @@ html, body {
   overflow-x: hidden;
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--term);
+  font-size: 1.4rem;
   max-width: 960px;
   margin: 3rem auto;
   padding: 0 1.5rem;
-  line-height: 1.7;
-  color: #1a1a1a;
+  line-height: 1.45;
+  color: var(--fg);
+  background: var(--bg);
+  text-shadow: var(--glow);
 }
 
-h2 {
-  margin-top: 3rem;
-  margin-bottom: 0.75rem;
-  font-weight: 700;
+/* Scanlines + vignette over every page */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.22) 3px,
+      rgba(0, 0, 0, 0) 4px
+    ),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.45) 100%);
 }
 
-h1 { font-size: 1.5rem; }
-h2 { font-size: 1.25rem; }
-h3 { font-size: 1.1rem; }
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+}
+
+/* ---------- Headings ---------- */
+
+h1, h2, h3, h4 {
+  font-family: var(--pixel);
+  font-weight: 400;
+  color: var(--fg-bright);
+  letter-spacing: 0.02em;
+}
+
+h1 { font-size: 2.4rem; line-height: 1.15; margin-bottom: 1.25rem; }
+h2 { font-size: 1.85rem; line-height: 1.2; margin-top: 3rem; margin-bottom: 0.75rem; }
+h3 { font-size: 1.55rem; line-height: 1.25; margin-top: 2rem; margin-bottom: 0.5rem; }
+h4 { font-size: 1.4rem; line-height: 1.3; margin-bottom: 0.4rem; }
+
+h1::before { content: "> "; color: var(--fg); }
+h2::before { content: "## "; color: var(--fg-dim); }
+h3::before { content: "### "; color: var(--fg-dim); }
 
 p {
   margin-bottom: 1rem;
 }
 
+strong, b {
+  color: var(--fg-bright);
+  font-weight: 400;
+  text-shadow: 0 0 3px rgba(184, 255, 201, 0.8), 0 0 10px rgba(110, 227, 155, 0.4);
+}
+
 ul, ol {
-  padding-left: 1.5rem;
+  padding-left: 1.75rem;
   margin-bottom: 1rem;
 }
 
-.toc-list {
-  list-style-position: inside;
-  padding-left: 0;
+ul { list-style: none; }
+ul > li::before {
+  content: "*";
+  display: inline-block;
+  width: 1.2rem;
+  margin-left: -1.2rem;
+  color: var(--fg-dim);
 }
 
-.toc-list li {
-  overflow: auto;
-}
-
-.toc-list .date {
-  float: right;
-  white-space: nowrap;
-}
+/* ---------- Links ---------- */
 
 a {
-  color: #1a1a1a;
+  color: var(--fg);
   text-decoration: none;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px dashed var(--fg-dim);
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-a:hover {
-  border-bottom-color: #1a1a1a;
+a:hover,
+a:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+  border-bottom-color: var(--fg);
+  text-shadow: none;
+  outline: none;
 }
 
+a.back {
+  font-family: var(--pixel);
+  font-size: 1.3rem;
+  border: 2px solid var(--fg-dim);
+  padding: 0.4rem 0.6rem;
+  display: inline-block;
+}
+
+a.back::before {
+  content: "[ESC] ";
+  color: var(--fg-dim);
+}
+
+a.back:hover::before { color: var(--bg); }
+
+/* ---------- Code ---------- */
+
 code {
-  background: #f5f5f5;
-  padding: 0.15rem 0.35rem;
-  font-size: 0.9em;
+  font-family: var(--code);
+  background: var(--bg-panel);
+  color: var(--fg-bright);
+  border: 1px solid var(--fg-faint);
+  padding: 0.05rem 0.35rem;
+  font-size: 0.72em;
 }
 
 pre {
-  background: #f5f5f5;
-  font-size: 1.05rem;
+  background: var(--bg-panel);
+  border: 2px solid var(--fg-dim);
+  box-shadow: 4px 4px 0 var(--fg-faint);
+  font-size: 1rem;
   line-height: 1.5;
-  padding: 0.3rem 0.3rem;
+  padding: 0.75rem 1rem;
   overflow-x: auto;
-  margin: 0.4rem 0 0.4rem;
-  border-radius: 15px;
+  margin: 0.75rem 0 1rem;
+  border-radius: 0;
 }
 
 pre code {
   background: none;
+  border: none;
   padding: 0;
+  font-size: 0.85rem;
 }
 
-pre code.hljs {
-  background: transparent;
+/* highlight.js — override the light theme with a phosphor palette */
+pre code.hljs,
+.hljs {
+  background: transparent !important;
+  color: var(--fg) !important;
   padding: 0;
+}
+.hljs-keyword, .hljs-built_in, .hljs-selector-tag, .hljs-literal { color: var(--cyan) !important; }
+.hljs-string, .hljs-attr, .hljs-template-variable { color: var(--amber) !important; }
+.hljs-number, .hljs-symbol { color: #ff7ad9 !important; }
+.hljs-comment, .hljs-quote { color: var(--fg-dim) !important; font-style: italic; }
+.hljs-title, .hljs-function, .hljs-title.function_, .hljs-title.class_ { color: var(--fg-bright) !important; }
+.hljs-params, .hljs-variable, .hljs-meta { color: var(--fg) !important; }
+
+/* ---------- Math ---------- */
+
+.katex {
+  font-size: 0.95em;
+  color: var(--fg-bright);
 }
 
 .katex-display {
@@ -101,43 +209,52 @@ pre code.hljs {
   }
 }
 
+/* ---------- Blocks ---------- */
+
 blockquote {
-  border-left: 3px solid #ccc;
+  border-left: 3px solid var(--fg-dim);
   padding-left: 1rem;
   margin: 1rem 0;
-  color: #555;
+  color: var(--fg-dim);
 }
 
 hr {
   border: none;
-  border-top: 1.8px solid #c8c8c8;
+  border-top: 2px dashed var(--fg-faint);
   margin: 2rem 0;
 }
 
-a.back {
-  font-size: 0.9rem;
-  border-bottom: none;
-}
-
-a.back:hover {
-  border-bottom: none;
-}
-
-.important {
-  background: #fff3cd;
-  border-left: 4px solid #ffc107;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  border-radius: 4px;
-}
-
+.important,
 .note {
-  background: #e8f4fd;
-  border-left: 4px solid #07f3ff;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  border-radius: 4px;
+  position: relative;
+  background: rgba(0, 0, 0, 0.35);
+  border: 4px double var(--amber);
+  padding: 1.6rem 1rem 0.75rem;
+  margin: 2rem 0;
+  border-radius: 0;
 }
+
+.important::before,
+.note::before {
+  position: absolute;
+  top: -0.75rem;
+  left: 0.75rem;
+  padding: 0 0.5rem;
+  background: var(--bg);
+  font-family: var(--pixel);
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+}
+
+.important::before { content: "[!] IMPORTANT"; color: var(--amber); }
+.important h4 { color: var(--amber); text-shadow: 0 0 6px rgba(227, 173, 85, 0.3); }
+
+.note { border-color: var(--cyan); }
+.note::before { content: "[i] NOTE"; color: var(--cyan); }
+.note h4 { color: var(--cyan); text-shadow: 0 0 6px rgba(116, 211, 220, 0.3); }
+
+.important p:last-child,
+.note p:last-child { margin-bottom: 0.25rem; }
 
 .code-dropdown {
   margin-top: 0.75rem;
@@ -145,60 +262,90 @@ a.back:hover {
 
 .code-dropdown summary {
   cursor: pointer;
-  font-weight: 700;
+  font-family: var(--pixel);
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
+  color: var(--fg-bright);
 }
+
+/* ---------- Images: shown as printouts so white diagrams stay legible ---------- */
 
 img {
   max-width: 100%;
   height: auto;
+  background: #e9f5ea;
+  padding: 6px;
+  border: 2px solid var(--fg-dim);
+  box-shadow: 4px 4px 0 var(--fg-faint);
+  image-rendering: auto;
 }
 
 .image-center {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 1rem auto;
 }
 
 .source {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 1.05rem;
+  color: var(--fg-dim);
   margin-top: 2rem;
-  border-top: 1px solid #eee;
+  border-top: 1px dashed var(--fg-faint);
   padding-top: 0.5rem;
 }
+
+/* ---------- Site header / TOC (non-CRT pages) ---------- */
 
 .site-header {
   margin-bottom: 2rem;
 }
 
 .site-title {
-  font-size: 2rem;
-  font-weight: 900;
+  font-family: var(--pixel);
+  font-size: 3.2rem;
+  line-height: 1.05;
+  color: var(--fg-bright);
 }
 
 .site-subtitle {
-  font-size: 1rem;
-  opacity: 0.8;
-  margin-top: 0.25rem;
+  font-size: 1.3rem;
+  color: var(--fg-dim);
+  margin-top: 0.5rem;
 }
 
 .toc-title {
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin-bottom: 0.25rem;
 }
 
 .toc-title-big {
-  font-size: 1.4rem;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .toc-note {
   margin-top: 0;
-  font-size: 0.75em;
+  font-family: var(--term);
+  font-size: 1.1rem;
+  color: var(--fg-dim);
   margin-bottom: 2rem;
-  opacity: 0.7;
 }
+
+.toc-list {
+  list-style-position: inside;
+  padding-left: 0;
+}
+
+.toc-list li {
+  overflow: auto;
+}
+
+.toc-list .date {
+  float: right;
+  white-space: nowrap;
+  color: var(--fg-dim);
+}
+
+/* ---------- Tables ---------- */
 
 table {
   border-collapse: collapse;
@@ -212,9 +359,17 @@ table {
 
 th,
 td {
-  border: 1px solid black;
+  border: 1px solid var(--fg-dim);
   padding: 12px 12px;
   vertical-align: top;
+}
+
+th {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: 1.3rem;
+  color: var(--fg-bright);
+  background: var(--bg-panel);
 }
 
 th:first-child,
@@ -239,7 +394,7 @@ td:first-child {
   align-items: center;
   justify-content: center;
   min-height: 84px;
-  color: #666;
+  color: var(--fg-dim);
 }
 
 .figure-pair {
@@ -268,10 +423,655 @@ td:first-child {
   padding-top: 0;
 }
 
+/* =========================================================
+   CRT monitor (landing pages: body.home)
+   ========================================================= */
+
+body.home {
+  max-width: none;
+  margin: 0;
+  padding: 2.5rem 1.5rem 3rem;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 38%, rgba(110, 227, 155, 0.07) 0%, rgba(110, 227, 155, 0) 70%),
+    radial-gradient(ellipse at 50% 0%, #2c2822 0%, #15130f 55%, #0b0a08 100%);
+  text-shadow: none;
+}
+
+/* the room has no scanlines — only the screen does */
+body.home::before { display: none; }
+
+/* ---------- 3D scene ---------- */
+
+.crt {
+  --gx: 0%;
+  --gy: 0%;
+  position: relative;
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+/* Static 3D look: we view the monitor from slightly above, so the top of the
+   case and the tapered tube housing behind it are visible above the front bezel. */
+.crt-back {
+  position: relative;
+  height: 64px;
+  margin: -16px 22px 0;
+  background:
+    /* vent slots on top of the housing */
+    repeating-linear-gradient(to right, transparent 0 14px, rgba(80, 72, 52, 0.35) 14px 17px) 50% 45% / 46% 10px no-repeat,
+    /* lit front edge fading to the shaded back */
+    linear-gradient(to top, #e6dec6 0%, #cfc5a8 45%, #a99f82 100%);
+  /* a rounded rectangle tipped away from us: perspective turns it into a
+     trapezoid while keeping every corner smooth */
+  border-radius: 90px 90px 18px 18px / 60px 60px 12px 12px;
+  transform: perspective(170px) rotateX(46deg);
+  transform-origin: 50% 100%;
+}
+
+.crt-back::after {
+  /* thin highlight where the top meets the front face */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Front case ---------- */
+
+.crt-bezel {
+  position: relative;
+  border-radius: 30px 30px 22px 22px;
+  padding: 2rem 2.1rem 3.9rem;
+  background:
+    /* faint plastic texture */
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.025) 0 2px, rgba(0, 0, 0, 0.02) 2px 4px),
+    linear-gradient(170deg, #ebe3cc 0%, #d8cfb3 40%, #c2b797 100%);
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.85),
+    inset 3px 0 3px rgba(255, 255, 255, 0.35),
+    inset -4px 0 5px rgba(0, 0, 0, 0.16),
+    inset 0 -5px 6px rgba(0, 0, 0, 0.22),
+    /* extruded case depth */
+    0 2px 0 #bdb293,
+    0 4px 0 #b0a586,
+    0 6px 0 #a39878,
+    0 8px 0 #968b6c,
+    0 10px 0 #8a7f61,
+    0 36px 60px rgba(0, 0, 0, 0.65),
+    0 0 0 1px #8f866a;
+}
+
+/* beveled recess the tube sits in: lit from above, so its top wall is in shadow */
+.crt-recess {
+  padding: 12px;
+  border-radius: 30px / 26px;
+  background: linear-gradient(to bottom, #7d755d 0%, #a59b7e 35%, #d9d0b5 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.crt-screen {
+  position: relative;
+  background: radial-gradient(ellipse at center, #0f1c11 0%, #070c07 78%, #030503 100%);
+  border-radius: 24px / 20px;
+  /* fixed-height screen: the monitor always fits the window, content scrolls inside */
+  height: clamp(380px, calc(100vh - 16rem - 60px), 900px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--fg);
+  text-shadow: var(--glow);
+  box-shadow:
+    inset 0 0 0 3px #111,
+    inset 0 0 50px rgba(0, 0, 0, 0.95),
+    inset 0 0 140px rgba(110, 227, 155, 0.07);
+}
+
+/* scanlines + curved glass inside the screen */
+.crt-screen::before,
+.crt-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.crt-screen::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.3) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  z-index: 4;
+}
+
+/* glass: a soft room reflection plus curved, darkened edges */
+.crt-screen::after {
+  background:
+    radial-gradient(ellipse 55% 40% at calc(28% + var(--gx)) calc(12% + var(--gy)), rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(115deg, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.035) 62%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.6) 100%);
+  box-shadow: inset 0 0 18px 6px rgba(0, 0, 0, 0.7);
+  z-index: 5;
+}
+
+.crt-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2rem 2.25rem 2.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--fg-dim) transparent;
+  transform-origin: 50% 50%;
+}
+
+.crt-content::-webkit-scrollbar { width: 10px; }
+.crt-content::-webkit-scrollbar-track { background: transparent; }
+.crt-content::-webkit-scrollbar-thumb {
+  background: var(--fg-faint);
+  border: 2px solid var(--fg-dim);
+}
+
+/* ---------- Standby: "click anywhere" before the first boot ---------- */
+
+.crt-standby {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 2rem;
+  color: var(--fg);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.crt-standby small {
+  font-size: 1.2rem;
+  color: var(--fg-dim);
+  letter-spacing: 0.04em;
+}
+
+.crt-standby .tap { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .crt-standby .click { display: none; }
+  .crt-standby .tap { display: inline; }
+}
+
+.standby .crt-standby { display: flex; animation: blink 2.4s ease-in-out infinite; }
+.standby .crt-content { visibility: hidden; }
+.standby { cursor: pointer; }
+
+/* CRT power on / off */
+.powering-on .crt-content { animation: crt-on 0.6s ease-out both; }
+.powered-off .crt-content { animation: crt-off 0.35s ease-in both; }
+.powered-off .crt-standby { display: none; }
+
+@keyframes crt-on {
+  0%   { transform: scale(0.15, 0.003); filter: brightness(4); opacity: 1; }
+  35%  { transform: scale(1, 0.003); filter: brightness(3); }
+  70%  { transform: scale(1, 1.04); filter: brightness(1.4); }
+  100% { transform: scale(1, 1); filter: brightness(1); }
+}
+
+@keyframes crt-off {
+  0%   { transform: scale(1, 1); filter: brightness(1); opacity: 1; }
+  55%  { transform: scale(1, 0.004); filter: brightness(3); opacity: 1; }
+  100% { transform: scale(0, 0.004); filter: brightness(5); opacity: 0; }
+}
+
+/* ---------- Case details ---------- */
+
+.crt-label {
+  position: absolute;
+  left: 2.6rem;
+  bottom: 1.35rem;
+  font-family: var(--pixel);
+  font-size: 1.25rem;
+  color: #6f6752;
+  letter-spacing: 0.18em;
+  /* debossed lettering */
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.crt-vents {
+  position: absolute;
+  right: 7.5rem;
+  bottom: 1.55rem;
+  width: 96px;
+  height: 14px;
+  background: repeating-linear-gradient(to right, #6f6650 0 3px, #d2c8ab 3px 4px, transparent 4px 9px);
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.crt-power {
+  position: absolute;
+  right: 2.4rem;
+  bottom: 1.05rem;
+  width: 34px;
+  height: 26px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: linear-gradient(to bottom, #e9e1c9, #bdb295);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 3px 0 #8f856a,
+    0 4px 6px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.crt-power::after {
+  /* power glyph */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 2px solid #7a715a;
+  border-top-color: transparent;
+  border-radius: 50%;
+}
+
+.crt-power:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 1px 0 #8f856a,
+    0 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.crt-power:focus-visible { outline: 2px dashed #6f6752; outline-offset: 3px; }
+
+.crt-led {
+  position: absolute;
+  right: 5.3rem;
+  bottom: 1.75rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4dff7a;
+  box-shadow: 0 0 6px #4dff7a, 0 0 14px rgba(77, 255, 122, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.crt:has(.powered-off) .crt-led {
+  background: #2c3a2e;
+  box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+}
+
+/* The stand sits BEHIND the case: the neck comes out from under the bezel,
+   and everything below the case is in its shadow (darker, smaller, set back). */
+.crt-bezel { z-index: 2; }
+
+/* Neck: rounded column tucked up under the case */
+.crt-stand {
+  position: relative;
+  z-index: 1;
+  width: 26%;
+  height: 52px;
+  margin: -22px auto 0;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.15) 55%, rgba(0, 0, 0, 0.05) 100%),
+    linear-gradient(to right, #6f6650 0%, #9d9376 22%, #bdb395 48%, #a99f82 70%, #6f6650 100%);
+  clip-path: polygon(12% 0, 88% 0, 96% 100%, 4% 100%);
+}
+
+/* Base: set back under the monitor, so only a shallow strip of its top shows */
+.crt-base {
+  position: relative;
+  width: 48%;
+  height: 32px;
+  margin: -8px auto 0;
+  filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.6)) drop-shadow(0 28px 36px rgba(0, 0, 0, 0.4));
+}
+
+.crt-base::before,
+.crt-base::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+/* top surface: darkest at the back, where the monitor shades it */
+.crt-base::before {
+  top: 0;
+  height: 20px;
+  background:
+    radial-gradient(ellipse 32% 90% at 50% 0%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(to bottom, #7e755c 0%, #a99f82 60%, #c8be9f 100%);
+  clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
+}
+
+/* front edge */
+.crt-base::after {
+  top: 20px;
+  height: 12px;
+  border-radius: 0 0 7px 7px;
+  background: linear-gradient(to bottom, #d9d0b4 0%, #b0a587 20%, #8c8266 100%);
+  box-shadow: inset 0 -2px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ---------- Sticky note with the keyboard tip ---------- */
+
+.sticky-note {
+  position: absolute;
+  right: -165px;
+  top: 64px;
+  width: 196px;
+  padding: 1.4rem 0.9rem 1rem;
+  background: linear-gradient(170deg, #fff59a 0%, #fbe86f 70%, #f2dc5c 100%);
+  color: #2b2a26;
+  font-family: 'Caveat', 'Comic Sans MS', cursive;
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1.25;
+  text-shadow: none;
+  transform: rotate(4deg);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.15),
+    6px 10px 14px rgba(0, 0, 0, 0.35);
+  border-bottom-right-radius: 18px 6px;
+}
+
+/* strip of tape */
+/* strip of tape across the note's top-left corner, stuck down onto the case */
+.sticky-note::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -30px;
+  width: 78px;
+  height: 24px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.62), rgba(240, 236, 220, 0.5));
+  border-left: 1px dashed rgba(0, 0, 0, 0.08);
+  border-right: 1px dashed rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transform: rotate(-38deg);
+}
+
+.sticky-note b {
+  display: block;
+  color: inherit;
+  text-shadow: none;
+  font-size: 1.6rem;
+  margin-bottom: 0.2rem;
+}
+
+.sticky-note p { margin: 0 0 0.25rem; }
+
+.sticky-note kbd {
+  font-family: inherit;
+  display: inline-block;
+  min-width: 1.4em;
+  padding: 0 0.25em;
+  border: 1.5px solid #2b2a26;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1.15;
+}
+
+/* no keyboard on touch devices, so no keyboard tip */
+@media (hover: none) and (pointer: coarse) {
+  .sticky-note { display: none; }
+}
+
+/* not enough room beside the monitor: hang the note off the bottom-left of the case */
+@media (max-width: 1260px) {
+  .sticky-note {
+    right: auto;
+    left: 1.5rem;
+    top: auto;
+    bottom: -100px;
+    padding: 1.1rem 0.8rem 0.6rem;
+    font-size: 1.15rem;
+    line-height: 1.15;
+    transform: rotate(-3deg);
+  }
+  .sticky-note b { font-size: 1.35rem; margin-bottom: 0.1rem; }
+  .sticky-note::before { top: -12px; left: 50%; margin-left: -39px; transform: rotate(-4deg); }
+  .sticky-note p { margin-bottom: 0.15rem; }
+  .crt-label { left: auto; right: 10.5rem; bottom: 1.35rem; }
+  .crt-vents { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .powering-on .crt-content,
+  .powered-off .crt-content { animation-duration: 0.01s; }
+  .standby .crt-standby { animation: none; }
+}
+
+/* terminal session inside the screen */
+
+.term-line {
+  font-family: var(--term);
+  font-size: 1.4rem;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+
+.term-line.dim { color: var(--fg-dim); }
+
+.term-title {
+  font-family: var(--pixel);
+  font-size: 3.0rem;
+  line-height: 1.05;
+  color: var(--fg-bright);
+  margin: 1.25rem 0 0.4rem;
+}
+
+.term-title::before { content: none; }
+
+.term-sub {
+  font-size: 1.4rem;
+  color: var(--fg-dim);
+  margin-bottom: 1.25rem;
+}
+
+.prompt { color: var(--fg-bright); }
+.p-user { color: var(--fg-bright); }
+.p-path { color: var(--cyan); text-shadow: 0 0 6px rgba(116, 211, 220, 0.3); }
+.ok { color: var(--fg-bright); }
+
+.crt-screen .toc-title-big {
+  font-family: var(--term);
+  font-size: 1.4rem;
+  color: var(--fg);
+  margin: 1.25rem 0 0.25rem;
+}
+
+.crt-screen .toc-title-big::before { content: none; }
+.crt-screen .toc-note { font-size: 1.3rem; }
+.toc-note small { font-size: inherit; }
+
+.crt-screen .toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem;
+  border-top: 1px dashed var(--fg-faint);
+}
+
+.crt-screen .toc-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 1.4rem;
+  overflow: visible;
+}
+
+.crt-screen .toc-list li::before {
+  color: var(--fg-dim);
+  min-width: 2.2ch;
+  width: auto;
+  margin: 0;
+  display: inline;
+}
+
+.crt-screen ol.toc-list { counter-reset: post; }
+.crt-screen ol.toc-list li { counter-increment: post; }
+.crt-screen ol.toc-list li::before { content: counter(post, decimal-leading-zero); }
+.crt-screen ul.toc-list li::before { content: "*"; }
+
+.crt-screen .toc-list a {
+  border-bottom: none;
+  flex: 1;
+}
+
+.crt-screen .toc-list .date {
+  float: none;
+  margin-left: auto;
+  color: var(--fg-dim);
+}
+
+.crt-screen .toc-list li:hover,
+.crt-screen .toc-list li.selected {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+}
+
+.crt-screen .toc-list li:hover *,
+.crt-screen .toc-list li.selected *,
+.crt-screen .toc-list li:hover::before,
+.crt-screen .toc-list li.selected::before {
+  color: var(--bg);
+  background: transparent;
+  text-shadow: none;
+}
+
+/* "cd .." reads as a typed command, not a link: no underline, no green highlight.
+   Selection is shown by the cursor appearing after it. */
+.crt-screen .nav-item,
+.crt-screen .nav-item:hover,
+.crt-screen .nav-item:focus-visible,
+.crt-screen .nav-item.selected {
+  color: var(--fg);
+  background: none;
+  border-bottom: none;
+  text-shadow: var(--glow);
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  margin-left: 0.1em;
+  vertical-align: -0.12em;
+  background: var(--fg);
+  box-shadow: var(--glow);
+  animation: blink 1.6s ease-in-out infinite;
+}
+
+/* on a "cd .." line the cursor only shows while that line is selected */
+.nav-item + .cursor { visibility: hidden; }
+.nav-item.selected + .cursor,
+.nav-item:hover + .cursor,
+.nav-item:focus-visible + .cursor { visibility: visible; }
+
+/* dim shell-comment hint after "cd .." */
+.back-hint { color: var(--fg-dim); text-shadow: none; }
+.back-hint .hint-touch { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .back-hint .hint-key { display: none; }
+  .back-hint .hint-touch { display: inline; }
+}
+
+/* boot sequence: JS adds .booting and reveals [data-boot] lines one by one */
+.booting [data-boot],
+.booting .toc-list li { visibility: hidden; }
+.booting [data-boot].shown,
+.booting .toc-list li.shown { visibility: visible; }
+
+/* gentle fade instead of a hard on/off blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; }
+}
+
+/* root directory listing: ls -l style rows */
+.crt-screen ul.dir-list li::before { content: "drwxr-xr-x"; min-width: 10ch; }
+.crt-screen .dir-list { margin-bottom: 1.5rem; }
+
+/* empty folder message, hidden automatically once a file is listed */
+.empty-note { padding: 0.15rem 0.4rem; color: var(--fg-dim); }
+.crt-content:has(.toc-list li) .empty-note { display: none; }
+.crt-screen .toc-list:not(:has(li)) { border-top: none; margin: 0; }
+
+/* =========================================================
+   Reading mode for posts (every page except the CRT screens):
+   softer green, no glow on body text, lighter scanlines.
+   ========================================================= */
+
+body:not(.home) {
+  --fg-text: #a7c9b1;
+  color: var(--fg-text);
+  text-shadow: none;
+  line-height: 1.55;
+}
+
+body:not(.home)::before {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.1) 3px,
+      rgba(0, 0, 0, 0) 4px
+    ),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 65%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+body:not(.home) h1,
+body:not(.home) h2,
+body:not(.home) h3,
+body:not(.home) h4 {
+  text-shadow: 0 0 6px rgba(110, 227, 155, 0.25);
+}
+
+body:not(.home) a { color: #7fdca3; }
+body:not(.home) a:hover,
+body:not(.home) a:focus-visible { color: var(--bg); }
+
+body:not(.home) strong,
+body:not(.home) b {
+  color: #e4f7e8;
+  text-shadow: none;
+}
+
+body:not(.home) .katex { color: #cbe6d3; }
+body:not(.home) code { color: #cbe6d3; }
+
+/* ---------- Mobile ---------- */
+
 @media (max-width: 600px) {
   body {
     margin: 1.5rem auto;
     padding: 0 1rem;
+    font-size: 1.3rem;
   }
 
   .toc-list li {
@@ -283,19 +1083,9 @@ td:first-child {
     float: none;
   }
 
-  .home .toc-list li {
-    display: block;
-    padding: 0.5rem 0;
-  }
-
-  .home .date {
-    display: block;
-    margin-top: 0.12rem;
-  }
-
-  h1 { font-size: 1.25rem; }
-  h2 { font-size: 1.1rem; }
-  h3 { font-size: 1rem; }
+  h1 { font-size: 1.9rem; }
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.4rem; }
 
   .figure-pair {
     flex-direction: column;
@@ -318,4 +1108,46 @@ td:first-child {
   .activation-table td {
     min-width: 0;
   }
+
+  /* CRT on small screens: thin bezel, screen fills the viewport, no stand */
+  body.home {
+    padding: 0.5rem;
+    margin: 0;
+  }
+
+  .crt-back, .crt-vents, .crt-stand, .crt-base, .crt-label, .sticky-note { display: none; }
+
+  .crt-bezel {
+    padding: 0.6rem 0.6rem 2.6rem;
+    border-radius: 16px;
+  }
+
+  .crt-recess { padding: 6px; border-radius: 14px; }
+
+  .crt-screen {
+    height: calc(100vh - 5rem);
+    height: calc(100dvh - 5rem);
+    border-radius: 12px;
+  }
+
+  .crt-content { padding: 1.1rem 1rem 1.25rem; }
+
+  .crt-power { right: 1rem; bottom: 0.55rem; width: 30px; height: 22px; }
+  .crt-led { right: 3.3rem; bottom: 1.1rem; }
+
+  .term-title { font-size: 2.2rem; }
+
+  .crt-screen .toc-list li {
+    flex-wrap: wrap;
+    padding: 0.35rem 0.3rem;
+    font-size: 1.3rem;
+  }
+
+  .crt-screen .toc-list .date {
+    flex-basis: 100%;
+    margin-left: calc(2.2ch + 0.75rem);
+    font-size: 1.1rem;
+  }
+
+  .crt-screen .dir-list .date { display: none; }
 }
