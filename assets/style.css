@@ -1062,6 +1062,12 @@ body:not(.home) b {
   text-shadow: none;
 }
 
+/* pictures sit above the scanline overlay so they show clean */
+body:not(.home) img {
+  position: relative;
+  z-index: 1001;
+}
+
 body:not(.home) .katex { color: #cbe6d3; }
 body:not(.home) code { color: #cbe6d3; }
 
